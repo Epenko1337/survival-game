@@ -1,0 +1,46 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwmodds74jem6"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s8v10"]
+
+[sub_resource type="Theme" id="Theme_8ihjv"]
+default_font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_50x0d"]
+font_size = 48
+
+[node name="Menu" type="Node2D"]
+
+[node name="ObjectsHolder" type="Control" parent="."]
+material = SubResource("CanvasItemMaterial_s8v10")
+layout_direction = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1152.0
+offset_bottom = 648.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ObjectsHolder"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 380.0
+grow_vertical = 2
+auto_translate = false
+theme = SubResource("Theme_8ihjv")
+theme_override_constants/separation = 50
+
+[node name="Label" type="Label" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+text = "Game name"
+label_settings = SubResource("LabelSettings_50x0d")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Начать игру"
