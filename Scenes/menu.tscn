@@ -1,4 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dwmodds74jem6"]
+[gd_scene load_steps=6 format=3 uid="uid://dwmodds74jem6"]
+
+[ext_resource type="Script" path="res://Scripts/menu.cs" id="1_2ldu8"]
+[ext_resource type="Script" path="res://StartGame.cs" id="2_wnjs4"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s8v10"]
 
@@ -9,6 +12,7 @@ default_font_size = 32
 font_size = 48
 
 [node name="Menu" type="Node2D"]
+script = ExtResource("1_2ldu8")
 
 [node name="ObjectsHolder" type="Control" parent="."]
 material = SubResource("CanvasItemMaterial_s8v10")
@@ -26,21 +30,29 @@ grow_vertical = 2
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_right = 380.0
+offset_right = 374.0
+offset_bottom = 71.0
 grow_vertical = 2
 auto_translate = false
 theme = SubResource("Theme_8ihjv")
 theme_override_constants/separation = 50
 
-[node name="Label" type="Label" parent="ObjectsHolder/VBoxContainer"]
+[node name="TopAppend" type="Control" parent="ObjectsHolder/VBoxContainer"]
 layout_mode = 2
-text = "Game name"
+
+[node name="Name" type="Label" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+text = "Frostbite"
 label_settings = SubResource("LabelSettings_50x0d")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="Button" type="Button" parent="ObjectsHolder/VBoxContainer"]
+[node name="StartGame" type="Button" parent="ObjectsHolder/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Начать игру"
+script = ExtResource("2_wnjs4")
+
+[node name="LabelDeltaTest" type="Label" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
