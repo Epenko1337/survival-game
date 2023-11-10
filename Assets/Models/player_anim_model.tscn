@@ -1,0 +1,72 @@
+[gd_scene load_steps=10 format=3 uid="uid://dpkorxa8a5coq"]
+
+[ext_resource type="PackedScene" uid="uid://b0xt4kw1njs7v" path="res://Assets/Models/player.glb" id="1_3c30i"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_311lr"]
+animation = &"walk2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_c5tg0"]
+animation = &"run2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_vdeo5"]
+animation = &"idle2"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_2ndpr"]
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_jb2ws"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_syqkw"]
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_af60w"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_4kbo5"]
+graph_offset = Vector2(-274.07, -280.608)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_vdeo5")
+nodes/Animation/position = Vector2(380, -80)
+"nodes/Animation 2/node" = SubResource("AnimationNodeAnimation_311lr")
+"nodes/Animation 2/position" = Vector2(180, 80)
+"nodes/Animation 3/node" = SubResource("AnimationNodeAnimation_c5tg0")
+"nodes/Animation 3/position" = Vector2(620, 140)
+nodes/RunBlend/node = SubResource("AnimationNodeBlend2_2ndpr")
+nodes/RunBlend/position = Vector2(880, -80)
+nodes/RunSpeed/node = SubResource("AnimationNodeTimeScale_jb2ws")
+nodes/RunSpeed/position = Vector2(780, 140)
+nodes/WalkBlend/node = SubResource("AnimationNodeBlend2_syqkw")
+nodes/WalkBlend/position = Vector2(580, -80)
+nodes/WalkSpeed/node = SubResource("AnimationNodeTimeScale_af60w")
+nodes/WalkSpeed/position = Vector2(380, 60)
+nodes/output/position = Vector2(1200, 100)
+node_connections = [&"output", 0, &"RunBlend", &"RunBlend", 0, &"WalkBlend", &"RunBlend", 1, &"RunSpeed", &"RunSpeed", 0, &"Animation 3", &"WalkBlend", 0, &"Animation", &"WalkBlend", 1, &"WalkSpeed", &"WalkSpeed", 0, &"Animation 2"]
+
+[node name="Model" instance=ExtResource("1_3c30i")]
+
+[node name="Skeleton3D" parent="Armature" index="0"]
+bones/0/rotation = Quaternion(-0.0467269, -6.18867e-05, 0.00507526, 0.998895)
+bones/1/rotation = Quaternion(0.0937651, 0.000343153, -0.00663351, 0.995572)
+bones/2/rotation = Quaternion(0.0467667, 0.000155721, 0.00189288, 0.998904)
+bones/3/position = Vector3(0.352536, 0.818722, -0.0725082)
+bones/3/rotation = Quaternion(0.0308413, 0.0310273, -0.935246, 0.351284)
+bones/4/rotation = Quaternion(0.0181696, -0.00512592, -0.27148, 0.962259)
+bones/5/rotation = Quaternion(0.110052, -0.000816427, 0.0261049, 0.993583)
+bones/6/rotation = Quaternion(0.0306505, -0.000171614, -0.00559761, 0.999515)
+bones/7/rotation = Quaternion(-0.12076, -0.717932, -0.0919083, 0.67937)
+bones/8/position = Vector3(-0.35091, 0.816052, -0.072414)
+bones/8/rotation = Quaternion(0.0247099, -0.0357815, 0.936354, 0.348353)
+bones/9/rotation = Quaternion(0.0181696, 0.00512592, 0.27148, 0.962259)
+bones/10/rotation = Quaternion(0.128986, 0.0224144, -0.00957032, 0.991347)
+bones/12/rotation = Quaternion(-0.141263, 0.707059, 0.0644608, 0.689897)
+bones/13/rotation = Quaternion(-0.027843, -0.0203101, 0.998972, -0.0294422)
+bones/14/rotation = Quaternion(-0.0360058, -0.00098674, -0.0252685, 0.999032)
+bones/15/rotation = Quaternion(0.525001, -0.032013, -0.00587575, 0.850479)
+bones/16/rotation = Quaternion(0.0168364, -0.0137275, 0.999216, 0.0330945)
+bones/17/rotation = Quaternion(-0.0490695, 0.000656199, 0.0252793, 0.998475)
+bones/18/rotation = Quaternion(0.530185, 0.0190342, 0.00525471, 0.847652)
+
+[node name="AnimationTree" type="AnimationTree" parent="." index="2"]
+tree_root = SubResource("AnimationNodeBlendTree_4kbo5")
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/RunBlend/blend_amount = 0
+parameters/RunSpeed/scale = 1.0
+parameters/WalkBlend/blend_amount = 0
+parameters/WalkSpeed/scale = 1.0

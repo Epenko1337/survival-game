@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" load_steps=4 format=3 uid="uid://cwuhe6a3rnhxt"]
+
+[ext_resource type="Texture2D" uid="uid://b2x4dccxg8mao" path="res://Assets/Snow004/Snow004_1K-PNG_Color.png" id="1_n6wql"]
+[ext_resource type="Texture2D" uid="uid://sednheyhuvyv" path="res://Assets/Snow004/Snow004_1K-PNG_NormalGL.png" id="2_cu8ft"]
+[ext_resource type="Texture2D" uid="uid://c8r56gnsp8psn" path="res://Assets/Snow004/Snow004_1K-PNG_Roughness.png" id="3_3kaie"]
+
+[resource]
+albedo_texture = ExtResource("1_n6wql")
+roughness_texture = ExtResource("3_3kaie")
+normal_enabled = true
+normal_scale = 6.39
+normal_texture = ExtResource("2_cu8ft")
+heightmap_scale = 0.0
+uv1_scale = Vector3(0.1, 0.1, 0.1)
+uv1_triplanar = true

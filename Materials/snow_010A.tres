@@ -1,0 +1,16 @@
+[gd_resource type="StandardMaterial3D" load_steps=5 format=3 uid="uid://bqmjc6mxaove7"]
+
+[ext_resource type="Texture2D" uid="uid://b1nmw6l73bqpm" path="res://Assets/Snow 010 A/Snow010A_1K-PNG_Color.png" id="1_6yd2d"]
+[ext_resource type="Texture2D" uid="uid://cpxmmmcfgvmxx" path="res://Assets/Snow 010 A/Snow010A_1K-PNG_AmbientOcclusion.png" id="2_clu5t"]
+[ext_resource type="Texture2D" uid="uid://c8dcn8am65uhm" path="res://Assets/Snow 010 A/Snow010A_1K-PNG_NormalGL.png" id="3_ggqqx"]
+[ext_resource type="Texture2D" uid="uid://cjdsfb6kd7wqq" path="res://Assets/Snow 010 A/Snow010A_1K-PNG_Roughness.png" id="4_hyxc7"]
+
+[resource]
+albedo_texture = ExtResource("1_6yd2d")
+metallic_specular = 0.0
+roughness_texture = ExtResource("4_hyxc7")
+normal_enabled = true
+normal_texture = ExtResource("3_ggqqx")
+ao_texture = ExtResource("2_clu5t")
+uv1_scale = Vector3(0.1, 0.1, 0.1)
+uv1_triplanar = true

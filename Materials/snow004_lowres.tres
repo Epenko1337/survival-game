@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" load_steps=4 format=3 uid="uid://dp2gj1pmd33yt"]
+
+[ext_resource type="Texture2D" uid="uid://cu5euy68ujf7c" path="res://Assets/Snow004lowRes/Snow004_Color.png" id="1_sissd"]
+[ext_resource type="Texture2D" uid="uid://j7gb3ensi47o" path="res://Assets/Snow004lowRes/Snow004_NormalGL.png" id="2_nimep"]
+[ext_resource type="Texture2D" uid="uid://bp86hljo20h0d" path="res://Assets/Snow004lowRes/Snow004_Roughness.png" id="3_r8vy4"]
+
+[resource]
+albedo_texture = ExtResource("1_sissd")
+roughness_texture = ExtResource("3_r8vy4")
+normal_enabled = true
+normal_texture = ExtResource("2_nimep")
+uv1_scale = Vector3(0.1, 0.1, 0.1)
+uv1_triplanar = true

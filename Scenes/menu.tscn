@@ -1,7 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dwmodds74jem6"]
+[gd_scene load_steps=8 format=3 uid="uid://dwmodds74jem6"]
 
 [ext_resource type="Script" path="res://Scripts/menu.cs" id="1_2ldu8"]
-[ext_resource type="Script" path="res://StartGame.cs" id="2_wnjs4"]
+[ext_resource type="PackedScene" uid="uid://vgxvaguyalgk" path="res://Scenes/UIButton.tscn" id="2_q8pbi"]
+[ext_resource type="PackedScene" uid="uid://7neo6sdl1ybx" path="res://Scenes/snow_particles_2d.tscn" id="3_s7yjl"]
+[ext_resource type="Texture2D" uid="uid://ddcp5wfgtbmk8" path="res://Assets/Best-Ice-Textures-2414908052.jpg" id="4_4td3t"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s8v10"]
 
@@ -15,6 +17,7 @@ font_size = 48
 script = ExtResource("1_2ldu8")
 
 [node name="ObjectsHolder" type="Control" parent="."]
+z_index = 1
 material = SubResource("CanvasItemMaterial_s8v10")
 layout_direction = 1
 layout_mode = 3
@@ -47,12 +50,19 @@ label_settings = SubResource("LabelSettings_50x0d")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="StartGame" type="Button" parent="ObjectsHolder/VBoxContainer"]
+[node name="StartGame" parent="ObjectsHolder/VBoxContainer" instance=ExtResource("2_q8pbi")]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Начать игру"
-script = ExtResource("2_wnjs4")
 
-[node name="LabelDeltaTest" type="Label" parent="ObjectsHolder/VBoxContainer"]
-layout_mode = 2
+[node name="SnowParticles" parent="." instance=ExtResource("3_s7yjl")]
+position = Vector2(117, -14)
+
+[node name="MenuPhoto" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(602.711, 350.875)
+scale = Vector2(1.02387, 1.09679)
+texture = ExtResource("4_4td3t")
+
+[connection signal="pressed" from="ObjectsHolder/VBoxContainer/StartGame" to="." method="StartGame"]

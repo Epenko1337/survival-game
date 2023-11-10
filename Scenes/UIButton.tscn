@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://vgxvaguyalgk"]
+
+[ext_resource type="Script" path="res://Scripts/UIButton.cs" id="1_os0qa"]
+[ext_resource type="AudioStream" uid="uid://s3re6o3hdxww" path="res://Assets/Sounds/ui/ui_click.wav" id="2_lj2vr"]
+[ext_resource type="AudioStream" uid="uid://5km8j45l6pdp" path="res://Assets/Sounds/ui/ui_hover.wav" id="3_0ac6a"]
+
+[node name="Control" type="Button"]
+anchors_preset = -1
+anchor_right = 0.134
+anchor_bottom = 0.11
+offset_right = 0.479996
+offset_bottom = -0.200005
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_os0qa")
+
+[node name="clickStream" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_lj2vr")
+
+[node name="hoverStream" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_0ac6a")
+
+[connection signal="button_down" from="." to="." method="BtnDown"]
+[connection signal="mouse_entered" from="." to="." method="BtnHover"]

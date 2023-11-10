@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://do0sor6ilftiu"]
+
+[ext_resource type="Texture2D" uid="uid://wb2hvrpbav3n" path="res://Assets/footstep.png" id="1_27u6t"]
+[ext_resource type="Script" path="res://Scripts/footstep.cs" id="2_xtkj2"]
+
+[node name="Decal" type="Decal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00908652, -0.00953257, -0.00193217)
+sorting_offset = -1.0
+size = Vector3(0.4, 0.4, 0.4)
+texture_albedo = ExtResource("1_27u6t")
+emission_energy = 0.0
+script = ExtResource("2_xtkj2")
+Lifetime = 20000.0

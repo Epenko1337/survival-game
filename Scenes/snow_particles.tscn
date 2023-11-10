@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://cu1hoj81vnko2"]
+
+[ext_resource type="Script" path="res://Scripts/snow_particles.cs" id="1_c2osp"]
+[ext_resource type="Material" uid="uid://2cdiookov3sd" path="res://Materials/snow_particles.tres" id="2_crjb3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drnbj"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 1, 1, 0.819608)
+texture_filter = 0
+texture_repeat = false
+disable_receive_shadows = true
+
+[sub_resource type="SphereMesh" id="SphereMesh_p8gyp"]
+material = SubResource("StandardMaterial3D_drnbj")
+radius = 0.05
+height = 0.1
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_c2osp")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.1, 0, 0, 0, 1, 0, 4, 0)
+visibility_range_fade_mode = 1
+amount = 1024
+lifetime = 2.0
+process_material = ExtResource("2_crjb3")
+draw_pass_1 = SubResource("SphereMesh_p8gyp")
