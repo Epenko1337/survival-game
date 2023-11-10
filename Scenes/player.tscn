@@ -29,7 +29,7 @@ transform = Transform3D(-0.4, 0, -2.98023e-08, 0, 0.4, 0, 2.98023e-08, 0, -0.4, 
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamPolyphonic_n4x10")
-volume_db = -20.0
+volume_db = -15.0
 
 [node name="DebugOverlay" parent="." instance=ExtResource("3_nsc6g")]
 
