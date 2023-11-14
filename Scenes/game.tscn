@@ -1,55 +1,106 @@
-[gd_scene load_steps=9 format=3 uid="uid://bqb37mwm6wvf3"]
+[gd_scene load_steps=11 format=3 uid="uid://bqb37mwm6wvf3"]
 
 [ext_resource type="Script" path="res://Scripts/game.cs" id="1_ld83f"]
 [ext_resource type="PackedScene" uid="uid://yvxkk53dyyjj" path="res://Scenes/player.tscn" id="2_5gtf3"]
 [ext_resource type="Material" uid="uid://cwuhe6a3rnhxt" path="res://Materials/snow_004.tres" id="2_x61la"]
 [ext_resource type="AudioStream" uid="uid://g58c3ipqasq2" path="res://Assets/Sounds/ambience/wind.mp3" id="3_4uw51"]
 [ext_resource type="Script" path="res://Scripts/WindSound.cs" id="4_l2oog"]
+[ext_resource type="PackedScene" uid="uid://c2fuvqsefvn25" path="res://Scenes/pine.tscn" id="6_3o124"]
+[ext_resource type="PackedScene" uid="uid://crcfhw6yawc7m" path="res://Scenes/Items/stick.tscn" id="7_1onaq"]
+[ext_resource type="Script" path="res://Scripts/PickableObject.cs" id="8_deev8"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qh4bm"]
-sky_top_color = Color(0.780392, 0.843137, 0.941176, 1)
-sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
-ground_bottom_color = Color(0, 0, 0, 1)
-ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+[sub_resource type="Environment" id="Environment_8j0av"]
+background_mode = 1
+background_color = Color(0.894118, 0.894118, 0.894118, 1)
+sky_rotation = Vector3(-6.28319, 0, 0)
+fog_enabled = true
+fog_light_color = Color(0.784314, 0.784314, 0.784314, 1)
+fog_density = 0.1
+fog_sky_affect = 0.0
 
-[sub_resource type="Sky" id="Sky_folnp"]
-sky_material = SubResource("ProceduralSkyMaterial_qh4bm")
-
-[sub_resource type="Environment" id="Environment_k3p2v"]
-background_mode = 2
-sky = SubResource("Sky_folnp")
-tonemap_mode = 2
-glow_enabled = true
+[sub_resource type="CameraAttributesPhysical" id="CameraAttributesPhysical_tq17d"]
 
 [node name="Game" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.074893, 0.333055, -0.152733)
 script = ExtResource("1_ld83f")
+worldTimeSpeed = 0.01
+worldTimeDaySpeed = 0.01
+worldTimeNightSpeed = 0.001
+dayStart = 0.7
+nightStart = 0.1
+timeScale = 0.2
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_k3p2v")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="."]
-transform = Transform3D(0.7301, 0, 0, 0, 0.7301, 0, 0, 0, 0.7301, 0, -0.01, 0)
+[node name="Map" type="CSGBox3D" parent="."]
+transform = Transform3D(0.7301, 0, 0, 0, 0.7301, 0, 0, 0, 0.7301, 0, -0.00999999, 0)
 use_collision = true
-size = Vector3(50, 0, 50)
+size = Vector3(250, 0, 250)
 material = ExtResource("2_x61la")
 metadata/_edit_lock_ = true
 
-[node name="WindSound" type="AudioStreamPlayer" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_8j0av")
+camera_attributes = SubResource("CameraAttributesPhysical_tq17d")
+
+[node name="Ambient" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_4uw51")
 volume_db = -20.0
 script = ExtResource("4_l2oog")
 
 [node name="Player" parent="." instance=ExtResource("2_5gtf3")]
-transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0.117, 1, -0.266)
 Speed = 2.0
-SprintMultiplier = 1.4
+SprintMultiplier = 2.0
 maxCameraDistance = 10.0
 cameraLerp = 0.05
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.337095, -0.66572, -0.66572, -6.18172e-08, -0.707107, 0.707107, -0.941471, 0.238362, 0.238362, -17.058, 9.03907, 4.17298)
-light_energy = 0.2
-light_indirect_energy = 0.0
-directional_shadow_max_distance = 430.1
+[node name="pine" parent="." instance=ExtResource("6_3o124")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.280643, -0.00999999, -7.8428)
 
-[connection signal="finished" from="WindSound" to="WindSound" method="OnFinished"]
+[node name="pine2" parent="." instance=ExtResource("6_3o124")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.46918, -0.00999859, 0.0653251)
+
+[node name="GridMap" type="GridMap" parent="."]
+
+[node name="stick2" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(7.85219e-05, 0, -0.3, 0, 0.3, 0, 0.3, 0, 7.85219e-05, 0.119189, -0.000726104, 1.60606)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick3" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.60204, -0.00622606, 1.24071)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.106013, -0.00999963, 1.63006)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick4" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(0.0143389, 0.00536308, -0.199413, -0.0700644, 0.187326, -1.46519e-10, 0.186776, 0.0698588, 0.015309, 0.413276, 0.0257872, 1.17073)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick7" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(0.231311, 0, 0.191038, 0, 0.3, 0, -0.191038, 0, 0.231311, 1.18768, 0.00988173, 0.839408)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick5" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(0.205295, 0, 0.218755, 0, 0.3, 0, -0.218755, 0, 0.205295, 0.930787, 0.0167038, 0.995175)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick6" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(0.291044, 0, 0.0727544, 0, 0.3, 0, -0.0727544, 0, 0.291044, 1.05855, 0.0144048, 0.862977)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[node name="stick8" parent="." instance=ExtResource("7_1onaq")]
+transform = Transform3D(-0.169429, 0, 0.0650384, 0, 0.235827, 0, -0.198033, 0, -0.0556443, 0.875503, 0.00221848, 0.633651)
+script = ExtResource("8_deev8")
+item_name = "stick"
+
+[connection signal="WorldTimeUpdate" from="." to="Player" method="OnWorldTimeUpdate"]
+[connection signal="finished" from="Ambient" to="Ambient" method="OnFinished"]
+[connection signal="DebugManualNewTime" from="Player" to="." method="OnDebugTimeChange"]
+[connection signal="DebugManualTime" from="Player" to="." method="OnDebugManulTime"]

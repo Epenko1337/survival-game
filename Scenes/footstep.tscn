@@ -1,13 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://do0sor6ilftiu"]
+[gd_scene load_steps=3 format=3 uid="uid://diww5ww1pvbva"]
 
-[ext_resource type="Texture2D" uid="uid://wb2hvrpbav3n" path="res://Assets/footstep.png" id="1_27u6t"]
-[ext_resource type="Script" path="res://Scripts/footstep.cs" id="2_xtkj2"]
+[ext_resource type="Texture2D" uid="uid://wb2hvrpbav3n" path="res://Assets/footstep.png" id="1_cw5vu"]
+[ext_resource type="Script" path="res://Scripts/footstep.cs" id="2_vloqq"]
 
-[node name="Decal" type="Decal"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00908652, -0.00953257, -0.00193217)
-sorting_offset = -1.0
-size = Vector3(0.4, 0.4, 0.4)
-texture_albedo = ExtResource("1_27u6t")
-emission_energy = 0.0
-script = ExtResource("2_xtkj2")
-Lifetime = 20000.0
+[node name="footstep" type="Sprite3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+gi_mode = 0
+axis = 1
+texture_filter = 0
+texture = ExtResource("1_cw5vu")
+script = ExtResource("2_vloqq")
+Lifetime = 30000.0

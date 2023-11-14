@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvrtoy5edxdwl"]
+
+[ext_resource type="Material" uid="uid://dth8f1kg2fxtg" path="res://Assets/debug_floor.tres" id="1_w7w0h"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_osanc"]
+
+[node name="Node3D" type="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_osanc")
+surface_material_override/0 = ExtResource("1_w7w0h")

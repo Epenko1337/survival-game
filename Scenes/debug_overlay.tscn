@@ -1,18 +1,69 @@
-[gd_scene load_steps=4 format=3 uid="uid://coeajg0neb87c"]
+[gd_scene load_steps=5 format=3 uid="uid://coeajg0neb87c"]
 
 [ext_resource type="Script" path="res://Scripts/debug_overlay.cs" id="1_6ep8g"]
+
+[sub_resource type="Theme" id="Theme_ur3x5"]
+VBoxContainer/constants/separation = 4
 
 [sub_resource type="SystemFont" id="SystemFont_jlxdw"]
 
 [sub_resource type="Theme" id="Theme_mmlkx"]
 default_font = SubResource("SystemFont_jlxdw")
-default_font_size = 45
+default_font_size = 24
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_6ep8g")
 
-[node name="FPS" type="Label" parent="."]
-offset_right = 227.0
-offset_bottom = 123.0
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 305.0
+offset_bottom = 719.0
+size_flags_horizontal = 4
+theme = SubResource("Theme_ur3x5")
+
+[node name="FPS" type="Label" parent="VBoxContainer"]
+layout_mode = 2
 theme = SubResource("Theme_mmlkx")
 text = "FPS:"
+
+[node name="Time" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "Time:
+"
+
+[node name="TimeSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="TimeDebug" type="CheckButton" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 24
+text = "Manual time change"
+
+[node name="Timescale" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Timescale:"
+
+[node name="TimescaleSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+max_value = 2.0
+step = 0.01
+value = 1.0
+
+[node name="Godmode" type="CheckButton" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "Godmode"
+
+[connection signal="value_changed" from="VBoxContainer/TimeSlider" to="." method="ManualTimeNew"]
+[connection signal="toggled" from="VBoxContainer/TimeDebug" to="." method="ManualTimeChange"]
+[connection signal="value_changed" from="VBoxContainer/TimescaleSlider" to="." method="OnTimescaleChange"]
+[connection signal="toggled" from="VBoxContainer/Godmode" to="." method="OnGodmodeChange"]

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class footstep : Decal
+public partial class footstep : Sprite3D
 {
 	[Export]
 	public float Lifetime = 2000;  
@@ -15,6 +15,6 @@ public partial class footstep : Decal
 	{
 		float timeDelta = Time.GetTicksUsec() / 1000 - lifeStart; 
 		if (timeDelta >= Lifetime) QueueFree();
-		AlbedoMix = 1 - timeDelta / Lifetime;
+		Modulate = Modulate with {A = 1 - timeDelta / Lifetime};
 	}
 }

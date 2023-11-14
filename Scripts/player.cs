@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 public partial class player : CharacterBody3D
 {
@@ -30,6 +31,18 @@ public partial class player : CharacterBody3D
 	[Export]
 	public float cameraLerp = 0.15f;
 
+	[Export]
+	public float maxPickupDistance = 1.4f;
+
+	[Signal]
+	public delegate void DebugManualTimeEventHandler(bool state);
+
+	[Signal]
+	public delegate void DebugManualNewTimeEventHandler(float value);
+
+	[Signal]
+	public delegate void WantsPickupEventHandler(PickableObject pickableObject, Vector2 screenPos);
+
 	private Camera3D Camera;
 	private AnimationPlayer animationPlayer;
 	private Node3D playerModel;
@@ -39,13 +52,40 @@ public partial class player : CharacterBody3D
 	private AudioStreamPlaybackPolyphonic polyphonicPlayback;
 	private List<AudioStreamWav> snowStepsSounds = new List<AudioStreamWav>(10); 
 	private Random randomizer = new Random();
-	private Vector2 lastPos;
+	private Vector3 lastPos;
 	private PackedScene footstepScene;
 	private bool lastStepInverse = false;
-
-
-	// Get the gravity from the project settings to be synced with RigidBody nodes.
+	private float worldTime = 1;
+	private Node2D debugOverlay;
+	private float internalTempMax = 100f;
+	private float internalTemp = 100f;
+	private float fatigueMax = 100f;
+	private float fatigue = 100f;
+	private float thirstMax = 100f;
+	private float thirst = 100f;
+	private float hungerMax = 100f;
+	private float hunger = 100f;
+	private float healthMax = 100f;
+	private float health = 100f;
+	private float staminaMax = 100f;
+	private float stamina = 100f;
+	private bool sprinting = false;
+	private bool moving = false;
+	private HUD PlayerHUD;
+	private bool staminaDrained = false;
+	public game world;
+	private float worldTimeDelta = 0;
+	private float minuteScale = 0.0006944444444444444f;
+	public bool godMode = false;
+	private Vector2 screenSize;
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
+	PackedScene debugRect;
+	private bool rotationControlled = false;
+	public Inventory inventory;
+	public bool movementBlock = false;
+	public float distancePassed = 0;
+	public PickableObject pickupTarget;
+	public AudioStream hintSound;
 
     public override void _Ready()
     {
@@ -62,12 +102,31 @@ public partial class player : CharacterBody3D
 		{
 			snowStepsSounds.Add(GD.Load<AudioStreamWav>($"res://Assets/Sounds/walking/snow_step{i}.wav"));
 		}
-		lastPos = new Vector2(Position.X + 1000, Position.Z + 1000);
+		lastPos = new Vector3(Position.X + 1000, Position.Y + 1000, Position.Z + 1000);
 		footstepScene = GD.Load<PackedScene>("res://Scenes/footstep.tscn");
+		debugOverlay = GetNode<Node2D>("DebugOverlay");
+		PlayerHUD = GetNode<HUD>("HUD");
+		world = GetParent<game>();
+		PlayerHUD.tempStatus.SetMaxValue(internalTempMax);
+		PlayerHUD.fatigueStatus.SetMaxValue(fatigueMax);
+		PlayerHUD.thirstStatus.SetMaxValue(thirstMax);
+		PlayerHUD.hungerStatus.SetMaxValue(hungerMax);
+		PlayerHUD.healthbar.SetMaxValue(healthMax);
+		PlayerHUD.staminaStatus.SetMaxValue(stamina);
+		UpdateHUDInfos();
+		screenSize = GetViewport().GetVisibleRect().Size;
+		debugRect = GD.Load<PackedScene>("res://Scenes/debug_rect.tscn");
+		inventory = new Inventory();
+		animationTree.AnimationFinished += (e) => OnAnimFinish(e);
+		hintSound = GD.Load<AudioStream>("res://Assets/Sounds/ui/hint.wav");
     }
 
     public override void _PhysicsProcess(double delta)
 	{
+		if (Input.IsActionJustPressed("debug_menu"))
+		{
+			debugOverlay.Visible = !debugOverlay.Visible;
+		}
 		Vector3 velocity = Velocity;
 
 		//gravity
@@ -80,29 +139,30 @@ public partial class player : CharacterBody3D
 
 		Vector2 inputDir = Input.GetVector("left", "right", "forward", "backward");
 		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-		bool sprinting = Input.IsActionPressed("sprint");
-		if (direction != Vector3.Zero)
+		sprinting = Input.IsActionPressed("sprint") && stamina > 0 && !staminaDrained && fatigue > 0 && !rotationControlled;
+		moving = direction != Vector3.Zero;
+		if (direction != Vector3.Zero && !movementBlock)
 		{
 			velocity.X = Mathf.Lerp(velocity.X, direction.X * (Speed * (sprinting ? SprintMultiplier : 1)), velocityLerp);
 			velocity.Z = Mathf.Lerp(velocity.Z, direction.Z * (Speed * (sprinting ? SprintMultiplier : 1)), velocityLerp);
 
 			Vector3 newRotation = playerModel.Rotation;
 			newRotation.Y = Mathf.LerpAngle(newRotation.Y, Mathf.Atan2(velocity.X, velocity.Z) - 0.7853981633974483f, angleLerp);
-			playerModel.Rotation = newRotation;
-
+			if (!rotationControlled) playerModel.Rotation = newRotation;
 			Vector3 playerPos = this.Position;
-			Vector2 currPos = new Vector2(playerPos.X, playerPos.Z);
+			distancePassed += playerPos.DistanceTo(lastPos);
+			lastPos = playerPos;
 
-			if (lastPos.DistanceTo(currPos) > 1.2)
+			if (distancePassed >= 1.2f)
 			{
-				lastPos = currPos;
+				distancePassed = 0;
 				PlaySound(snowStepsSounds[randomizer.Next(0, 8)]);
-				Decal footStep = footstepScene.Instantiate<Decal>();
+				Sprite3D footStep = footstepScene.Instantiate<Sprite3D>();
 				Vector3 footStepPos = playerPos;
 				footStepPos.Y = 0;
 				footStep.Position = footStepPos;
 				newRotation.Y += 0.7853981633974483f;
-				newRotation.Z = lastStepInverse ? Mathf.DegToRad(180) : 0;
+				footStep.FlipH = lastStepInverse;
 				lastStepInverse = !lastStepInverse;
 				footStep.Rotation = newRotation;
 				GetParent().AddChild(footStep);
@@ -113,10 +173,24 @@ public partial class player : CharacterBody3D
 			velocity.X = Mathf.Lerp(Velocity.X, 0, velocityLerp);
 			velocity.Z = Mathf.Lerp(Velocity.Z, 0, velocityLerp);
 		}
+
+		if (rotationControlled && !movementBlock)
+		{
+			Vector3 newRotation = playerModel.Rotation;
+			Vector2 viewportCenter = screenSize;
+			viewportCenter.X /= 2;
+			viewportCenter.Y /= 2;
+			Vector2 mousePos = GetViewport().GetMousePosition();
+			newRotation.Y = Mathf.LerpAngle(newRotation.Y, Mathf.Atan2(viewportCenter.X - mousePos.X, viewportCenter.Y - mousePos.Y) + Mathf.DegToRad(180), angleLerp);
+			playerModel.Rotation = newRotation;
+		}
+
 		animationTree.Set("parameters/WalkSpeed/scale", velocity.Length() / 2.5);
 		animationTree.Set("parameters/RunSpeed/scale", velocity.Length() / 4);
 		float animAmount = velocity.Length() / (sprinting ? Speed*SprintMultiplier : Speed) * (sprinting ? 2 : 1);
 		float currRunBlend = (float)animationTree.Get("parameters/RunBlend/blend_amount");
+		float controllRotationBlend = (float)animationTree.Get("parameters/controlledBlend/blend_amount");
+		animationTree.Set("parameters/controlledBlend/blend_amount", Mathf.Lerp(controllRotationBlend, rotationControlled && !movementBlock ? 1 : 0, velocityLerp));
 
 		if (animAmount <= 1)
 		{
@@ -146,8 +220,60 @@ public partial class player : CharacterBody3D
 			}
 		}
 		UpdateCameraPosition();
+		UpdateHUDInfos();
 		Velocity = velocity;
 		MoveAndSlide();
+	}
+
+	public override void _Input(InputEvent @event)
+    {
+		if (@event is InputEventMouse eventMouse)
+		{
+			if (eventMouse.ButtonMask == MouseButtonMask.Right)
+			{
+				if (eventMouse.IsPressed() || @event is InputEventMouseMotion) 
+				{
+					if (eventMouse.IsPressed())
+					{
+						Godot.Collections.Dictionary dict = ScreenToWorld(eventMouse.Position, 2);
+						if (dict.ContainsKey("collider"))
+						{
+							Node parent = dict["collider"].As<Node>().GetParent();
+							InteractionMenu(parent, eventMouse.Position);
+						}
+					}
+					rotationControlled = true;
+				}
+				else rotationControlled = false;
+			}
+			else
+			{
+				rotationControlled = false;
+			}
+		}
+    }
+
+	private Godot.Collections.Dictionary ScreenToWorld(Vector2 screenPos, uint collisionMask = 1)
+	{
+		var spaceState = GetWorld3D().DirectSpaceState;
+		var origin = Camera.ProjectRayOrigin(screenPos);
+		var end = origin + Camera.ProjectRayNormal(screenPos) * 10000;
+		var query = PhysicsRayQueryParameters3D.Create(origin, end);
+		query.CollisionMask = collisionMask;
+		query.CollideWithAreas = true;
+		query.CollideWithBodies = true;
+		return spaceState.IntersectRay(query);
+	}
+
+	private void InteractionMenu(Node node, Vector2 screenPos)
+	{
+		if (node is PickableObject pickableObject)
+		{
+			if (Position.DistanceTo(pickableObject.Position) < maxPickupDistance)
+			{
+				EmitSignal(SignalName.WantsPickup, pickableObject, screenPos);
+			}
+		}
 	}
 
 	private void SetCameraPosition(float value, bool force=false)
@@ -173,5 +299,86 @@ public partial class player : CharacterBody3D
 	private void PlaySound(AudioStream stream)
 	{
 		polyphonicPlayback.PlayStream(stream);
+	}
+
+	public void OnWorldTimeUpdate(float newWorldTime)
+	{
+		worldTimeDelta += Mathf.Abs(worldTime - newWorldTime);
+		if (worldTimeDelta >= minuteScale)
+		{
+			UpdateConditions(worldTimeDelta / minuteScale);
+			worldTimeDelta = 0;
+		}
+		worldTime = newWorldTime;
+		debugOverlay.Call("UpdateWorldTime", newWorldTime);
+	}
+
+	public void OnManualTimeChange(bool state)
+	{
+		EmitSignal(SignalName.DebugManualTime, state);
+	}
+
+	public void OnManualNewTime(float value)
+	{
+		EmitSignal(SignalName.DebugManualNewTime, value);
+	}
+
+	public void UpdateHUDInfos()
+	{
+		PlayerHUD.tempStatus.SetValue(internalTemp);
+		PlayerHUD.fatigueStatus.SetValue(fatigue);
+		PlayerHUD.thirstStatus.SetValue(thirst);
+		PlayerHUD.hungerStatus.SetValue(hunger);
+		PlayerHUD.healthbar.SetValue(health);
+		PlayerHUD.staminaStatus.SetValue(stamina);
+		PlayerHUD.SetDayTime(!world.night);
+	}
+
+	public void UpdateConditions(float delta)
+	{
+		//called every ~1 minute of game world time
+		if (godMode) return;
+		if (sprinting && moving)
+		{
+			stamina = Mathf.Clamp(stamina - staminaMax / 100 * 2.8f, 0, staminaMax);
+			if (stamina == 0) staminaDrained = true;
+		}
+		else
+		{
+			stamina = Mathf.Clamp(stamina + staminaMax / 100 * 1.2f, 0, staminaMax);
+			if (stamina / staminaMax > 0.2) staminaDrained = false;
+		}
+
+		internalTemp = Mathf.Clamp(internalTemp - internalTempMax / 100f * (world.night ? 0.4f : 0.2f) * delta, 0, internalTempMax);
+		fatigue = Mathf.Clamp(fatigue - fatigueMax / 100f * 0.07f * delta * (sprinting && moving ? 2f : 1f), 0, fatigueMax);
+		thirst = Mathf.Clamp(thirst - thirstMax / 100f * 0.09f * delta * (sprinting && moving ? 2f : 1f), 0, thirstMax);
+		hunger = Mathf.Clamp(hunger - hungerMax / 100f * 0.06f * delta * (sprinting && moving ? 2f : 1f), 0, hungerMax);
+
+		health = Mathf.Clamp(health - healthMax / 100f * (internalTemp == 0 ? 0.3333f : 0) * delta, 0, healthMax);
+		health = Mathf.Clamp(health - healthMax / 100f * (fatigue == 0 ? 0.01666f : 0) * delta, 0, healthMax);
+		health = Mathf.Clamp(health - healthMax / 100f * (thirst == 0 ? 0.03333f : 0) * delta, 0, healthMax);
+		health = Mathf.Clamp(health - healthMax / 100f * (hunger == 0 ? 0.01666f : 0) * delta, 0, healthMax);
+	}
+
+	public void OnPickup(PickableObject pickableObject)
+	{
+		if (Position.DistanceTo(pickableObject.Position) <= maxPickupDistance)
+		{
+			pickupTarget = pickableObject;
+			movementBlock = true;
+			animationTree.Set("parameters/pickupShot/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
+		}
+	}
+	
+	public void OnAnimFinish(string animationName)
+	{
+		if (animationName == "pickup")
+		{
+			movementBlock = false;
+			uint itemCount = inventory.AddItem(pickupTarget);
+			string name = inventory.GetItemName(pickupTarget.item_name);
+			world.RemoveChild(pickupTarget);
+			PlayerHUD.Popup($"Подобрано \"{name}\" ({itemCount})");
+		}
 	}
 }

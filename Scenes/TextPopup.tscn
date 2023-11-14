@@ -1,0 +1,76 @@
+[gd_scene load_steps=6 format=3 uid="uid://dtvnre6abb6mr"]
+
+[ext_resource type="Script" path="res://Scripts/TextPopup.cs" id="1_17kjb"]
+[ext_resource type="AudioStream" uid="uid://h5stceqe1nyp" path="res://Assets/Sounds/ui/hint.wav" id="2_r6cca"]
+
+[sub_resource type="Animation" id="Animation_mv01b"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Label:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_20ae3"]
+resource_name = "showandhide"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Label:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.5, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_43cf8"]
+_data = {
+"RESET": SubResource("Animation_mv01b"),
+"showandhide": SubResource("Animation_20ae3")
+}
+
+[node name="TextPopup" type="Node2D"]
+script = ExtResource("1_17kjb")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -146.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 1
+theme_override_font_sizes/font_size = 24
+text = "Popup text"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_43cf8")
+}
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_r6cca")
+volume_db = -20.0
