@@ -1,5 +1,7 @@
 using Godot;
+using Godot.Collections;
 using System;
+using System.Linq;
 
 public partial class HUD : Node2D
 {
@@ -14,6 +16,11 @@ public partial class HUD : Node2D
 	public PickupContextMenu pickupContextMenu;
 	public player playerInstance;
 	public PackedScene popupScene;
+	public VBoxContainer inventoryVbox;
+	public PackedScene inventoryItemScene;
+	public bool inventoryOpen = false;
+	public Control inventoryControl;
+	public Label weightLabel;
 	public override void _Ready()
 	{
 		tempStatus = GetNode<hud_info_item>("TempStatus");
@@ -28,6 +35,11 @@ public partial class HUD : Node2D
 		pickupContextMenu = GetNode<PickupContextMenu>("PickupContextMenu");
 		playerInstance = GetParent<player>();
 		popupScene = GD.Load<PackedScene>("res://Scenes/TextPopup.tscn");
+		inventoryControl = GetNode<Control>("Inventory");
+		inventoryControl.Visible = false;
+		inventoryVbox = GetNode<VBoxContainer>("Inventory/ScrollContainer/VBoxContainer");
+		inventoryItemScene = GD.Load<PackedScene>("res://Scenes/InventoryItem.tscn");
+		weightLabel = GetNode<Label>("Inventory/WeightLabel");
 	}
 
 	public override void _Process(double delta)
@@ -44,7 +56,7 @@ public partial class HUD : Node2D
 	public void ShowPickupContext(PickableObject pickableObject, Vector2 screenPos)
 	{
 		pickupContextMenu.Position = screenPos;
-		Godot.Collections.Dictionary item = (Godot.Collections.Dictionary)playerInstance.inventory.globalItems[pickableObject.item_name];
+		Dictionary item = (Dictionary)playerInstance.inventory.globalItems[pickableObject.item_name];
 		pickupContextMenu.title = (string) item["name"];
 		pickupContextMenu.pickableObject = pickableObject;
 		pickupContextMenu.Visible = true;
@@ -56,5 +68,33 @@ public partial class HUD : Node2D
 		TextPopup popup = popupScene.Instantiate<TextPopup>();
 		AddChild(popup);
 		popup.Start(text);
+	}
+
+	public void SwitchInventory()
+	{
+		inventoryOpen = !inventoryOpen;
+		if (inventoryOpen) UpdateInventory();
+		inventoryControl.Visible = !inventoryControl.Visible;
+	}
+
+	public void UpdateInventory()
+	{
+		weightLabel.Text = $"Занято {playerInstance.inventory.GetFullWeight()}/{playerInstance.maxCapacity} кг";
+		foreach (Node item in inventoryVbox.GetChildren())
+		{
+			item.QueueFree();
+		}
+
+		foreach (string key in playerInstance.inventory.inventoryItems.Keys)
+		{
+			InventoryItem item = inventoryItemScene.Instantiate<InventoryItem>();
+			Dictionary inventoryItem = (Dictionary)playerInstance.inventory.inventoryItems[key];
+			item.realName = key;
+			item.name = (string)inventoryItem["name"];
+			item.count = (uint)inventoryItem["count"];
+			item.weight = (float)inventoryItem["weight"];
+			inventoryVbox.AddChild(item);
+			item.Update();
+		}
 	}
 }

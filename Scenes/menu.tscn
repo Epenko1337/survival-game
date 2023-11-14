@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/menu.cs" id="1_2ldu8"]
 [ext_resource type="PackedScene" uid="uid://vgxvaguyalgk" path="res://Scenes/UIButton.tscn" id="2_q8pbi"]
 [ext_resource type="PackedScene" uid="uid://7neo6sdl1ybx" path="res://Scenes/snow_particles_2d.tscn" id="3_s7yjl"]
-[ext_resource type="Texture2D" uid="uid://ddcp5wfgtbmk8" path="res://Assets/Best-Ice-Textures-2414908052.jpg" id="4_4td3t"]
+[ext_resource type="Texture2D" uid="uid://cl120fecke6wr" path="res://Assets/Best-Ice-Textures-2414908052.jpg" id="4_4td3t"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s8v10"]
 

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/game.cs" id="1_ld83f"]
 [ext_resource type="PackedScene" uid="uid://yvxkk53dyyjj" path="res://Scenes/player.tscn" id="2_5gtf3"]
 [ext_resource type="Material" uid="uid://cwuhe6a3rnhxt" path="res://Materials/snow_004.tres" id="2_x61la"]
-[ext_resource type="AudioStream" uid="uid://g58c3ipqasq2" path="res://Assets/Sounds/ambience/wind.mp3" id="3_4uw51"]
+[ext_resource type="AudioStream" uid="uid://ddrmv3bw7jn1c" path="res://Assets/Sounds/ambience/wind.mp3" id="3_4uw51"]
 [ext_resource type="Script" path="res://Scripts/WindSound.cs" id="4_l2oog"]
 [ext_resource type="PackedScene" uid="uid://c2fuvqsefvn25" path="res://Scenes/pine.tscn" id="6_3o124"]
 [ext_resource type="PackedScene" uid="uid://crcfhw6yawc7m" path="res://Scenes/Items/stick.tscn" id="7_1onaq"]
@@ -61,44 +61,34 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.46918, -0.00999859, 0.0653
 [node name="GridMap" type="GridMap" parent="."]
 
 [node name="stick2" parent="." instance=ExtResource("7_1onaq")]
-transform = Transform3D(7.85219e-05, 0, -0.3, 0, 0.3, 0, 0.3, 0, 7.85219e-05, 0.119189, -0.000726104, 1.60606)
+transform = Transform3D(-0.135945, 0, -0.26743, 0, 0.3, 0, 0.26743, 0, -0.135945, 0.850178, 0.0699911, 1.57829)
 script = ExtResource("8_deev8")
 item_name = "stick"
-
-[node name="stick3" parent="." instance=ExtResource("7_1onaq")]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.60204, -0.00622606, 1.24071)
-script = ExtResource("8_deev8")
-item_name = "stick"
+count = 0
 
 [node name="stick" parent="." instance=ExtResource("7_1onaq")]
 transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.106013, -0.00999963, 1.63006)
 script = ExtResource("8_deev8")
 item_name = "stick"
+count = 0
 
 [node name="stick4" parent="." instance=ExtResource("7_1onaq")]
 transform = Transform3D(0.0143389, 0.00536308, -0.199413, -0.0700644, 0.187326, -1.46519e-10, 0.186776, 0.0698588, 0.015309, 0.413276, 0.0257872, 1.17073)
 script = ExtResource("8_deev8")
 item_name = "stick"
+count = 0
 
-[node name="stick7" parent="." instance=ExtResource("7_1onaq")]
-transform = Transform3D(0.231311, 0, 0.191038, 0, 0.3, 0, -0.191038, 0, 0.231311, 1.18768, 0.00988173, 0.839408)
-script = ExtResource("8_deev8")
-item_name = "stick"
+[node name="pine3" parent="." instance=ExtResource("6_3o124")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.91127, -0.0100014, 6.45388)
 
-[node name="stick5" parent="." instance=ExtResource("7_1onaq")]
-transform = Transform3D(0.205295, 0, 0.218755, 0, 0.3, 0, -0.218755, 0, 0.205295, 0.930787, 0.0167038, 0.995175)
-script = ExtResource("8_deev8")
-item_name = "stick"
+[node name="pine4" parent="." instance=ExtResource("6_3o124")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.49639, -0.00999999, 5.72491)
 
-[node name="stick6" parent="." instance=ExtResource("7_1onaq")]
-transform = Transform3D(0.291044, 0, 0.0727544, 0, 0.3, 0, -0.0727544, 0, 0.291044, 1.05855, 0.0144048, 0.862977)
-script = ExtResource("8_deev8")
-item_name = "stick"
+[node name="pine5" parent="." instance=ExtResource("6_3o124")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.09069, -0.0100014, 0.441454)
 
-[node name="stick8" parent="." instance=ExtResource("7_1onaq")]
-transform = Transform3D(-0.169429, 0, 0.0650384, 0, 0.235827, 0, -0.198033, 0, -0.0556443, 0.875503, 0.00221848, 0.633651)
-script = ExtResource("8_deev8")
-item_name = "stick"
+[node name="pine6" parent="." instance=ExtResource("6_3o124")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.06826, -0.00999999, -6.01317)
 
 [connection signal="WorldTimeUpdate" from="." to="Player" method="OnWorldTimeUpdate"]
 [connection signal="finished" from="Ambient" to="Ambient" method="OnFinished"]

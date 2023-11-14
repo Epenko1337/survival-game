@@ -57,4 +57,17 @@ public class Inventory
         Dictionary item = globalItems[realName].As<Dictionary>();
         return (string)item["name"];
     }
+
+    public float GetFullWeight()
+    {
+        float weight = 0;
+        foreach (string key in inventoryItems.Keys)
+		{
+            Dictionary item = (Dictionary)inventoryItems[key];
+            uint count = (uint)item["count"];
+            float perWeight = (float)item["weight"];
+            weight += count*perWeight;
+		}
+        return weight;
+    }
 }

@@ -3,10 +3,12 @@ using System;
 
 public partial class ObjectFade : Area3D
 {
-	bool inside = false;
+	bool playerInside = false;
+	bool cameraInside = false;
 	StandardMaterial3D[] materials;
 	int surfaceCount;
 	float alpha = 1f;
+	Node3D thisParent;
     public override void _Ready()
     {
 		MeshInstance3D mesh = GetParent().GetChild<MeshInstance3D>(0);
@@ -17,20 +19,20 @@ public partial class ObjectFade : Area3D
 			materials[i] = (StandardMaterial3D)mesh.Mesh.SurfaceGetMaterial(i).Duplicate(false);
 			materials[i].Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
 			materials[i].CullMode = BaseMaterial3D.CullModeEnum.Back;
-			materials[i].DistanceFadeMode = BaseMaterial3D.DistanceFadeModeEnum.PixelAlpha;
-			materials[i].DistanceFadeMinDistance = 3f;
-			materials[i].DistanceFadeMaxDistance = 20f;
 			mesh.SetSurfaceOverrideMaterial(i, materials[i]);
 		}
-		this.BodyEntered += (e) => OnBodyEnter((PhysicsBody3D)e);
-		this.BodyExited += (e) => OnBodyExit((PhysicsBody3D)e);
+		this.AreaEntered += (e) => OnAreaEnter(e);
+		this.AreaExited += (e) => OnAreaExit(e);
+		thisParent = GetParent<Node3D>();
     }
 
-    public override void _Process(double delta)
+    public override void _PhysicsProcess(double delta)
     {
-        if (inside)
+		thisParent.Visible = !(cameraInside && !playerInside);
+		alpha = thisParent.Visible ? alpha : 0;
+        if (playerInside)
 		{
-			ApplyAlpha(Mathf.Lerp(alpha, 0.3f, 8f*(float)delta));
+			ApplyAlpha(Mathf.Lerp(alpha, 0.2f, 8f*(float)delta));
 		}
 		else if (alpha != 1f)
 		{
@@ -38,11 +40,37 @@ public partial class ObjectFade : Area3D
 		}
     }
 
+	private void OnAreaEnter(Area3D area)
+	{
+		Node parent = area.GetParent();
+		if (parent is Camera3D)
+		{
+			cameraInside = true;
+		}
+		else if (parent is CharacterBody3D)
+		{
+			playerInside = true;
+		}
+	}
+
+	private void OnAreaExit(Area3D area)
+	{
+		Node parent = area.GetParent();
+		if (parent is Camera3D)
+		{
+			cameraInside = false;
+		}
+		else if (parent is CharacterBody3D)
+		{
+			playerInside = false;
+		}
+	}
+
     private void OnBodyEnter(PhysicsBody3D body)
 	{
-		if (body is CharacterBody3D)
+		if (body.GetParent().GetParent() is CharacterBody3D)
 		{
-			inside = true;
+			//inside = true;
 		}
 	}
 
@@ -50,7 +78,7 @@ public partial class ObjectFade : Area3D
 	{
 		if (body is CharacterBody3D)
 		{
-			inside = false;
+			//inside = false;
 		}
 	}
 

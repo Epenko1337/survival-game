@@ -34,6 +34,12 @@ public partial class player : CharacterBody3D
 	[Export]
 	public float maxPickupDistance = 1.4f;
 
+	[Export]
+	public float maxCapacity = 15f;
+
+	[Export]
+	public float capacity = 0f;
+
 	[Signal]
 	public delegate void DebugManualTimeEventHandler(bool state);
 
@@ -127,6 +133,12 @@ public partial class player : CharacterBody3D
 		{
 			debugOverlay.Visible = !debugOverlay.Visible;
 		}
+
+		if (Input.IsActionJustPressed("inventory_open"))
+		{
+			PlayerHUD.SwitchInventory();
+		}
+
 		Vector3 velocity = Velocity;
 
 		//gravity
@@ -376,8 +388,10 @@ public partial class player : CharacterBody3D
 		{
 			movementBlock = false;
 			uint itemCount = inventory.AddItem(pickupTarget);
-			string name = inventory.GetItemName(pickupTarget.item_name);
+			Godot.Collections.Dictionary item = (Godot.Collections.Dictionary)inventory.globalItems[pickupTarget.item_name];
+			string name = (string)item["name"];
 			world.RemoveChild(pickupTarget);
+			PlayerHUD.UpdateInventory();
 			PlayerHUD.Popup($"Подобрано \"{name}\" ({itemCount})");
 		}
 	}
