@@ -17,6 +17,7 @@ public partial class menu : Node2D
 
 	public void StartGame()
 	{
+		QueueFree();
 		GetTree().ChangeSceneToFile("res://Scenes/game.tscn");
 	}
 }

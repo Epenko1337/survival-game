@@ -63,11 +63,11 @@ public partial class HUD : Node2D
 		pickupContextMenu.Update();
 	}
 
-	public void Popup(string text)
+	public void Popup(string text, bool sound)
 	{
 		TextPopup popup = popupScene.Instantiate<TextPopup>();
 		AddChild(popup);
-		popup.Start(text);
+		popup.Start(text, sound);
 	}
 
 	public void SwitchInventory()
@@ -87,11 +87,13 @@ public partial class HUD : Node2D
 
 		foreach (string key in playerInstance.inventory.inventoryItems.Keys)
 		{
-			InventoryItem item = inventoryItemScene.Instantiate<InventoryItem>();
 			Dictionary inventoryItem = (Dictionary)playerInstance.inventory.inventoryItems[key];
+			uint itemCount = (uint)inventoryItem["count"];
+			if (itemCount == 0) continue;
+			InventoryItem item = inventoryItemScene.Instantiate<InventoryItem>();
 			item.realName = key;
 			item.name = (string)inventoryItem["name"];
-			item.count = (uint)inventoryItem["count"];
+			item.count = itemCount;
 			item.weight = (float)inventoryItem["weight"];
 			inventoryVbox.AddChild(item);
 			item.Update();

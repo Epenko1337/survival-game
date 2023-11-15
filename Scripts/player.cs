@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -92,6 +93,10 @@ public partial class player : CharacterBody3D
 	public float distancePassed = 0;
 	public PickableObject pickupTarget;
 	public AudioStream hintSound;
+	public AudioStream itemSound;
+	PlayerCmd playerCmd;
+	WorldCmd worldCmd;
+	PackedScene deathScreenScene;
 
     public override void _Ready()
     {
@@ -125,6 +130,12 @@ public partial class player : CharacterBody3D
 		inventory = new Inventory();
 		animationTree.AnimationFinished += (e) => OnAnimFinish(e);
 		hintSound = GD.Load<AudioStream>("res://Assets/Sounds/ui/hint.wav");
+		playerCmd = GetNode<PlayerCmd>("/root/PlayerCmd");
+		playerCmd.DropItem += (e) => OnDropItem(e);
+		itemSound = GD.Load<AudioStream>("res://Assets/Sounds/pickup/itemthing.wav");
+		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
+		worldCmd.WorldTimeUpdate += (e) => OnWorldTimeUpdate(e);
+		deathScreenScene = GD.Load<PackedScene>("res://Scenes/deathScreen.tscn");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -247,7 +258,7 @@ public partial class player : CharacterBody3D
 				{
 					if (eventMouse.IsPressed())
 					{
-						Godot.Collections.Dictionary dict = ScreenToWorld(eventMouse.Position, 2);
+						Dictionary dict = ScreenToWorld(eventMouse.Position, 2);
 						if (dict.ContainsKey("collider"))
 						{
 							Node parent = dict["collider"].As<Node>().GetParent();
@@ -265,7 +276,7 @@ public partial class player : CharacterBody3D
 		}
     }
 
-	private Godot.Collections.Dictionary ScreenToWorld(Vector2 screenPos, uint collisionMask = 1)
+	private Dictionary ScreenToWorld(Vector2 screenPos, uint collisionMask = 1)
 	{
 		var spaceState = GetWorld3D().DirectSpaceState;
 		var origin = Camera.ProjectRayOrigin(screenPos);
@@ -281,7 +292,7 @@ public partial class player : CharacterBody3D
 	{
 		if (node is PickableObject pickableObject)
 		{
-			if (Position.DistanceTo(pickableObject.Position) < maxPickupDistance)
+			if (GlobalPosition.DistanceTo(pickableObject.GlobalPosition) < maxPickupDistance)
 			{
 				EmitSignal(SignalName.WantsPickup, pickableObject, screenPos);
 			}
@@ -370,11 +381,13 @@ public partial class player : CharacterBody3D
 		health = Mathf.Clamp(health - healthMax / 100f * (fatigue == 0 ? 0.01666f : 0) * delta, 0, healthMax);
 		health = Mathf.Clamp(health - healthMax / 100f * (thirst == 0 ? 0.03333f : 0) * delta, 0, healthMax);
 		health = Mathf.Clamp(health - healthMax / 100f * (hunger == 0 ? 0.01666f : 0) * delta, 0, healthMax);
+
+		if (health == 0) Die();
 	}
 
 	public void OnPickup(PickableObject pickableObject)
 	{
-		if (Position.DistanceTo(pickableObject.Position) <= maxPickupDistance)
+		if (GlobalPosition.DistanceTo(pickableObject.GlobalPosition) <= maxPickupDistance)
 		{
 			pickupTarget = pickableObject;
 			movementBlock = true;
@@ -388,11 +401,33 @@ public partial class player : CharacterBody3D
 		{
 			movementBlock = false;
 			uint itemCount = inventory.AddItem(pickupTarget);
-			Godot.Collections.Dictionary item = (Godot.Collections.Dictionary)inventory.globalItems[pickupTarget.item_name];
+			Dictionary item = (Dictionary)inventory.globalItems[pickupTarget.item_name];
 			string name = (string)item["name"];
-			world.RemoveChild(pickupTarget);
-			PlayerHUD.UpdateInventory();
-			PlayerHUD.Popup($"Подобрано \"{name}\" ({itemCount})");
+			pickupTarget.QueueFree();
+			if (PlayerHUD.inventoryOpen) PlayerHUD.UpdateInventory();
+			PlayerHUD.Popup($"Подобрано \"{name}\" ({itemCount})", false);
+			PlaySound(itemSound);
 		}
+	}
+
+	public void OnDropItem(string realName)
+	{
+		inventory.RemoveItem(realName);
+		PlayerHUD.UpdateInventory();
+		PackedScene itemScene = inventory.globalItems[realName].As<Dictionary>()["scene"].As<PackedScene>();
+		PickableObject item = itemScene.Instantiate<PickableObject>();
+		item.Position = Position with {Y = 0};
+		item.Rotation = playerModel.Rotation with {X = 0, Z = 0};
+		world.AddChild(item);
+		PlaySound(itemSound);
+	}
+
+	public void Die()
+	{
+		playerCmd.Reset();
+		worldCmd.RequestStopWorld();
+		deathScreen dscreen = deathScreenScene.Instantiate<deathScreen>();
+		PlayerHUD.AddChild(dscreen);
+		dscreen.Start();
 	}
 }

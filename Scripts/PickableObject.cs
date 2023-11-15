@@ -7,5 +7,5 @@ public partial class PickableObject : InteractableObject
     public string item_name;
 
     [Export]
-    public uint count;
+    public uint count = 1;
 }

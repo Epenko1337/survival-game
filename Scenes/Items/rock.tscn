@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://cgnd5ems1lmy6"]
+
+[ext_resource type="Script" path="res://Scripts/PickableObject.cs" id="1_ch3c6"]
+[ext_resource type="PackedScene" uid="uid://8ytgtx6wf250" path="res://Assets/Models/Items/rock.glb" id="2_lpjhy"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ggn7q"]
+size = Vector3(0.270247, 0.238964, 0.407091)
+
+[node name="rock" type="Node3D"]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -0.00529333, 0, 6.22869e-05)
+script = ExtResource("1_ch3c6")
+item_name = "rock"
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0165201, 0, 0.00502411)
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_ggn7q")
+
+[node name="Model" parent="." instance=ExtResource("2_lpjhy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.12866e-10)

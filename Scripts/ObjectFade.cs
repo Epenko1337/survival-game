@@ -5,21 +5,24 @@ public partial class ObjectFade : Area3D
 {
 	bool playerInside = false;
 	bool cameraInside = false;
-	StandardMaterial3D[] materials;
+	StandardMaterial3D[] alphaMaterials;
+	StandardMaterial3D[] origMaterials;
 	int surfaceCount;
 	float alpha = 1f;
 	Node3D thisParent;
+	MeshInstance3D meshInstance;
     public override void _Ready()
     {
-		MeshInstance3D mesh = GetParent().GetChild<MeshInstance3D>(0);
-		surfaceCount = mesh.Mesh.GetSurfaceCount();
-		materials = new StandardMaterial3D[surfaceCount];
+		meshInstance = GetParent().GetChild<MeshInstance3D>(0);
+		surfaceCount = meshInstance.Mesh.GetSurfaceCount();
+		alphaMaterials = new StandardMaterial3D[surfaceCount];
+		origMaterials = new StandardMaterial3D[surfaceCount];
 		for (int i = 0; i < surfaceCount; i++)
 		{
-			materials[i] = (StandardMaterial3D)mesh.Mesh.SurfaceGetMaterial(i).Duplicate(false);
-			materials[i].Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
-			materials[i].CullMode = BaseMaterial3D.CullModeEnum.Back;
-			mesh.SetSurfaceOverrideMaterial(i, materials[i]);
+			origMaterials[i] = (StandardMaterial3D)meshInstance.Mesh.SurfaceGetMaterial(i);
+			alphaMaterials[i] = (StandardMaterial3D)meshInstance.Mesh.SurfaceGetMaterial(i).Duplicate(false);
+			alphaMaterials[i].Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+			alphaMaterials[i].CullMode = BaseMaterial3D.CullModeEnum.Back;
 		}
 		this.AreaEntered += (e) => OnAreaEnter(e);
 		this.AreaExited += (e) => OnAreaExit(e);
@@ -28,8 +31,8 @@ public partial class ObjectFade : Area3D
 
     public override void _PhysicsProcess(double delta)
     {
-		thisParent.Visible = !(cameraInside && !playerInside);
-		alpha = thisParent.Visible ? alpha : 0;
+		meshInstance.Visible = !(cameraInside && !playerInside);
+		alpha = meshInstance.Visible ? alpha : 0;
         if (playerInside)
 		{
 			ApplyAlpha(Mathf.Lerp(alpha, 0.2f, 8f*(float)delta));
@@ -37,6 +40,10 @@ public partial class ObjectFade : Area3D
 		else if (alpha != 1f)
 		{
 			ApplyAlpha(Mathf.Lerp(alpha, 1f, 8f*(float)delta));
+		}
+		else if (!playerInside && alpha == 1f)
+		{
+			SwitchMaterials(false);
 		}
     }
 
@@ -49,6 +56,7 @@ public partial class ObjectFade : Area3D
 		}
 		else if (parent is CharacterBody3D)
 		{
+			SwitchMaterials(true);
 			playerInside = true;
 		}
 	}
@@ -66,31 +74,23 @@ public partial class ObjectFade : Area3D
 		}
 	}
 
-    private void OnBodyEnter(PhysicsBody3D body)
-	{
-		if (body.GetParent().GetParent() is CharacterBody3D)
-		{
-			//inside = true;
-		}
-	}
-
-	private void OnBodyExit(PhysicsBody3D body)
-	{
-		if (body is CharacterBody3D)
-		{
-			//inside = false;
-		}
-	}
-
 	private void ApplyAlpha(float newAlpha)
 	{
 		alpha = newAlpha;
 		for (int i = 0; i < surfaceCount; i++)
 		{
-			StandardMaterial3D material = materials[i];
+			StandardMaterial3D material = alphaMaterials[i];
 			Color newColor = material.AlbedoColor;
 			newColor.A = alpha;
 			material.AlbedoColor = newColor;
+		}
+	}
+
+	private void SwitchMaterials(bool alpha)
+	{
+		for (int i = 0; i < surfaceCount; i++)
+		{
+			meshInstance.SetSurfaceOverrideMaterial(i, alpha ? alphaMaterials[i] : origMaterials[i]);
 		}
 	}
 }

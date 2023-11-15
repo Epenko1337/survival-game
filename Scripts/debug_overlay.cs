@@ -23,10 +23,12 @@ public partial class debug_overlay : Node2D
 	public bool manualTime = false;
 	public bool manualTimeScale = false;
 	private player playerInstance;
+	private Label posLabel;
 	public override void _Ready()
 	{
 		container = GetNode<VBoxContainer>("VBoxContainer");
 		fps = container.GetNode<Label>("FPS");
+		posLabel = container.GetNode<Label>("Position");
 		time = container.GetNode<Label>("Time");
 		timescale = container.GetNode<Label>("Timescale");
 		timeSlider = container.GetNode<HSlider>("TimeSlider");
@@ -41,6 +43,7 @@ public partial class debug_overlay : Node2D
 			fps.Text = $"FPS: {Engine.GetFramesPerSecond()}";
 			time.Text = $"WorldTime: {worldTime}";
 			timescale.Text = $"Timescale: {playerInstance.world.timeScale}";
+			posLabel.Text = $"Position: \n\tX: {playerInstance.GlobalPosition.X}\n\tY: {playerInstance.GlobalPosition.Y}\n\tZ: {playerInstance.GlobalPosition.Z}";
 			if (!manualTime)
 			{
 				timeSlider.Value = worldTime;

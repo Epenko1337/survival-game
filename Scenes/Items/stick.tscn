@@ -1,14 +1,15 @@
 [gd_scene load_steps=4 format=3 uid="uid://crcfhw6yawc7m"]
 
-[ext_resource type="Script" path="res://Scripts/InteractableObject.cs" id="1_pvm44"]
 [ext_resource type="PackedScene" uid="uid://4oxc2eu5ytum" path="res://Assets/Models/Items/stick.glb" id="1_t52lu"]
+[ext_resource type="Script" path="res://Scripts/PickableObject.cs" id="1_x53fy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ggn7q"]
 size = Vector3(0.5, 0.5, 2)
 
 [node name="stick" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0951714, 0, 0)
-script = ExtResource("1_pvm44")
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, -0.0441693, 0, 6.22869e-05)
+script = ExtResource("1_x53fy")
+item_name = "stick"
 
 [node name="Model" parent="." instance=ExtResource("1_t52lu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0165201, 0, 0.00502411)

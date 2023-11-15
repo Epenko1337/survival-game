@@ -8,15 +8,18 @@ public class Inventory
     public Dictionary inventoryItems = new Dictionary();
     public Inventory()
     {
-        globalItems.Add("stick", GlobalItemConstructor("Палка", 0.1f));
+        globalItems.Add("stick", GlobalItemConstructor("Палка", 0.25f, GD.Load<PackedScene>("res://Scenes/Items/stick.tscn")));
+        globalItems.Add("rock", GlobalItemConstructor("Камень", 0.1f, GD.Load<PackedScene>("res://Scenes/Items/rock.tscn")));
+        globalItems.Add("flint", GlobalItemConstructor("Кремень", 0.1f, GD.Load<PackedScene>("res://Scenes/Items/flint.tscn")));
     }
 
-    public Dictionary GlobalItemConstructor(string name, float weight)
+    public Dictionary GlobalItemConstructor(string name, float weight, PackedScene scene)
     {
         return new Dictionary
         {
             {"name", name},
             {"weight", weight},
+            {"scene", scene}
         };
     }
 
@@ -33,7 +36,7 @@ public class Inventory
     public uint AddItem(PickableObject item)
     {
         Dictionary globalItem = globalItems[item.item_name].As<Dictionary>();
-        return AddItem(item.item_name, globalItem["name"].As<string>(), globalItem["weight"].As<float>(), 1);
+        return AddItem(item.item_name, globalItem["name"].As<string>(), globalItem["weight"].As<float>(), item.count);
     }
 
     public uint AddItem(string realName, string name, float weight, uint count)
@@ -44,12 +47,12 @@ public class Inventory
             uint newCount = (uint)item["count"] + count;
             item["count"] = newCount;
             return newCount;
-        }
+        }   
         else
         {
             inventoryItems.Add(realName, ItemConstructor(name, weight, count));
+            return count;
         }
-        return 1;
     }
 
     public string GetItemName(string realName)
@@ -69,5 +72,12 @@ public class Inventory
             weight += count*perWeight;
 		}
         return weight;
+    }
+
+    public void RemoveItem(string realName, uint count = 1)
+    {
+        Dictionary item = (Dictionary)inventoryItems[realName];
+        uint currCount = (uint)item["count"];
+        item["count"] = Mathf.Clamp(currCount - count, 0, currCount);
     }
 }

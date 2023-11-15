@@ -14,11 +14,11 @@ public partial class TextPopup : Node2D
 		animationPlayer.AnimationFinished += (e) => Nuke(e);
 	}
 
-	public void Start(string text)
+	public void Start(string text, bool sound)
 	{
 		label.Text = text;
 		label.Visible = true;
-		audioStreamPlayer.Play();
+		if (sound) audioStreamPlayer.Play();
 		animationPlayer.Play("showandhide");
 	}
 

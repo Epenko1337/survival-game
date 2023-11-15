@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using System;
 
 public partial class game : Node3D
@@ -26,24 +27,40 @@ public partial class game : Node3D
 	private bool debugManualTime = false;
 	public bool night = false;
 	public bool day = true;
+	private WorldCmd worldCmd;
 
 	[Export]
 	public float timeScale = 1f;
+	GridMap pinesGridmap;
+	PackedScene pineScene;
 
-	[Signal]
-	public delegate void WorldTimeUpdateEventHandler(float WorldTime);
+	bool worldEnd = false;
+
+	RandomNumberGenerator random;
+	AudioStreamPlayer ambientPlayer;
+
 	public override void _Ready()
 	{
 		worldEnvironment = GetNode<WorldEnvironment>("WorldEnvironment");
-	}
-
-	public override void _Process(double delta)
-	{
+		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
+		worldCmd.StopWorld += () => Stop();
+		worldCmd.DestroyWorld += () => Destroy();
+		pinesGridmap = GetNode<GridMap>("Pines");
+		pineScene = GD.Load<PackedScene>("res://Scenes/pine.tscn");
+		ambientPlayer = GetNode<AudioStreamPlayer>("Ambient");
+		random = new RandomNumberGenerator();
+		random.Randomize();
+		GenerateWorld();
 	}
 
     public override void _PhysicsProcess(double delta)
     {
-		if (!debugManualTime)
+		if (worldEnd)
+		{
+			worldTime = (float)Mathf.Clamp(worldTime - 0.1*delta, 0, 1);
+			worldEnvironment.Environment.FogDensity = (float)Mathf.Clamp(worldEnvironment.Environment.FogDensity + 0.1*delta, 0, 1);
+		}
+		else if (!debugManualTime)
 		{
 			if (day)
 			{
@@ -61,7 +78,7 @@ public partial class game : Node3D
 			else if (worldTime == 1) timeDirection = true;
 			night = worldTime <= nightStart;
 			day = worldTime >= dayStart;
-			EmitSignal(SignalName.WorldTimeUpdate, worldTime);
+			worldCmd.RequestWorldTimeUpdate(worldTime);
 		}
 
 		worldEnvironment.Environment.BackgroundEnergyMultiplier = worldTime;
@@ -76,5 +93,30 @@ public partial class game : Node3D
 	public void OnDebugTimeChange(float newWorldTime)
 	{
 		if (debugManualTime) worldTime = newWorldTime;
+	}
+
+	public void GenerateWorld()
+	{
+		Array<Vector3I> usedCells = pinesGridmap.GetUsedCells();
+		for (int i = 0; i < usedCells.Count; i++)
+		{
+			Node3D pine = pineScene.Instantiate<Node3D>();
+			AddChild(pine);
+			pine.GlobalPosition = pinesGridmap.MapToLocal(usedCells[i]) with {Y = 0.35f};
+			pine.Rotation = pine.Rotation with {Y = random.RandfRange(-360, 360)};
+		}
+		pinesGridmap.QueueFree();
+	}
+
+	public void Stop()
+	{
+		worldEnd = true;
+		ambientPlayer.Stop();
+	}
+
+	public void Destroy()
+	{
+		worldCmd.Reset();
+		GetTree().ChangeSceneToFile("res://Scenes/menu.tscn");
 	}
 }
