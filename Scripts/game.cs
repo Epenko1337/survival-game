@@ -23,19 +23,16 @@ public partial class game : Node3D
 	public float nightStart = 0.2f;
 	private bool timeDirection = true;
 	private WorldEnvironment worldEnvironment;
-
 	private bool debugManualTime = false;
 	public bool night = false;
 	public bool day = true;
 	private WorldCmd worldCmd;
-
+	
 	[Export]
 	public float timeScale = 1f;
 	GridMap pinesGridmap;
 	PackedScene pineScene;
-
 	bool worldEnd = false;
-
 	RandomNumberGenerator random;
 	AudioStreamPlayer ambientPlayer;
 
@@ -94,6 +91,7 @@ public partial class game : Node3D
 
 		worldEnvironment.Environment.BackgroundEnergyMultiplier = worldTime;
 		worldEnvironment.Environment.FogLightEnergy = worldTime;
+		if (!worldEnd) worldEnvironment.Environment.FogDensity = 0.1f;
 	}
 
 	public void OnDebugManulTime(bool state)

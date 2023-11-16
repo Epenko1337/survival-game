@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://bh8rl7vs7duv6" path="res://Assets/Textures/thirst.png" id="6_1qllu"]
 [ext_resource type="Texture2D" uid="uid://csl0eeg7gqjo0" path="res://Assets/Textures/stomach.png" id="7_ji52h"]
 [ext_resource type="PackedScene" uid="uid://dqrpcpv4jjx53" path="res://Scenes/healthbar.tscn" id="8_nuiq5"]
-[ext_resource type="Texture2D" uid="uid://cmdpwdrc8sciv" path="res://Assets/sprint.png" id="10_5yd7x"]
+[ext_resource type="Texture2D" uid="uid://cmdpwdrc8sciv" path="res://Assets/Textures/sprint.png" id="10_x8nsq"]
 [ext_resource type="Texture2D" uid="uid://bk18i0s3mk8lg" path="res://Assets/Textures/sun.png" id="12_vqf2u"]
 [ext_resource type="Texture2D" uid="uid://b2e52q4ousd4c" path="res://Assets/Textures/moon.png" id="13_p2aq8"]
 [ext_resource type="PackedScene" uid="uid://cve18ff1kmae" path="res://Scenes/InventoryItem.tscn" id="15_hg0u6"]
@@ -70,7 +70,7 @@ scale = Vector2(0.8, 0.8)
 [node name="StaminaStatus" parent="HUD" instance=ExtResource("3_5q12t")]
 position = Vector2(330, 634)
 scale = Vector2(0.3, 0.3)
-texture = ExtResource("10_5yd7x")
+texture = ExtResource("10_x8nsq")
 
 [node name="DayNightStatus" type="Node2D" parent="HUD"]
 position = Vector2(1237, 43)

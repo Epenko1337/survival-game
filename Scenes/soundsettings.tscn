@@ -1,0 +1,89 @@
+[gd_scene load_steps=8 format=3 uid="uid://btrss4pkym40w"]
+
+[ext_resource type="Script" path="res://Scripts/soundsettings.cs" id="1_5ab5o"]
+[ext_resource type="PackedScene" uid="uid://vgxvaguyalgk" path="res://Scenes/UIButton.tscn" id="2_escnp"]
+[ext_resource type="PackedScene" uid="uid://7neo6sdl1ybx" path="res://Scenes/snow_particles_2d.tscn" id="3_sd6mo"]
+[ext_resource type="Texture2D" uid="uid://cl120fecke6wr" path="res://Assets/Best-Ice-Textures-2414908052.jpg" id="4_vhrer"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s8v10"]
+
+[sub_resource type="Theme" id="Theme_8ihjv"]
+default_font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_50x0d"]
+font_size = 48
+
+[node name="Menu" type="Node2D"]
+script = ExtResource("1_5ab5o")
+
+[node name="ObjectsHolder" type="Control" parent="."]
+z_index = 1
+material = SubResource("CanvasItemMaterial_s8v10")
+layout_direction = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1152.0
+offset_bottom = 648.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ObjectsHolder"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 374.0
+offset_bottom = 71.0
+grow_vertical = 2
+auto_translate = false
+theme = SubResource("Theme_8ihjv")
+theme_override_constants/separation = 50
+
+[node name="TopAppend" type="Control" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+
+[node name="Name" type="Label" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+text = "Настройки"
+label_settings = SubResource("LabelSettings_50x0d")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ToMenu" parent="ObjectsHolder/VBoxContainer" instance=ExtResource("2_escnp")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Обратно в меню"
+
+[node name="Label" type="Label" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+text = "Громкость эффектов"
+
+[node name="EffecSlider" type="HSlider" parent="ObjectsHolder/VBoxContainer/Label"]
+layout_mode = 2
+offset_top = 52.0
+offset_right = 374.0
+offset_bottom = 68.0
+
+[node name="Label2" type="Label" parent="ObjectsHolder/VBoxContainer"]
+layout_mode = 2
+text = "Громкость фоновых звуков"
+autowrap_mode = 2
+
+[node name="AmbentSlider" type="HSlider" parent="ObjectsHolder/VBoxContainer/Label2"]
+layout_mode = 2
+offset_top = 110.0
+offset_right = 374.0
+offset_bottom = 126.0
+
+[node name="SnowParticles" parent="." instance=ExtResource("3_sd6mo")]
+position = Vector2(117, -14)
+
+[node name="MenuPhoto" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(602.711, 350.875)
+scale = Vector2(1.02387, 1.09679)
+texture = ExtResource("4_vhrer")
+
+[connection signal="pressed" from="ObjectsHolder/VBoxContainer/ToMenu" to="." method="GotoMenu"]

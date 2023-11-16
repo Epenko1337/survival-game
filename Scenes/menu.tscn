@@ -56,6 +56,18 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Начать игру"
 
+[node name="Settings" parent="ObjectsHolder/VBoxContainer" instance=ExtResource("2_q8pbi")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Настройки"
+
+[node name="Exit" parent="ObjectsHolder/VBoxContainer" instance=ExtResource("2_q8pbi")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Выход"
+
 [node name="SnowParticles" parent="." instance=ExtResource("3_s7yjl")]
 position = Vector2(117, -14)
 
@@ -66,3 +78,5 @@ scale = Vector2(1.02387, 1.09679)
 texture = ExtResource("4_4td3t")
 
 [connection signal="pressed" from="ObjectsHolder/VBoxContainer/StartGame" to="." method="StartGame"]
+[connection signal="pressed" from="ObjectsHolder/VBoxContainer/Settings" to="." method="GotoSettings"]
+[connection signal="pressed" from="ObjectsHolder/VBoxContainer/Exit" to="." method="Exit"]
