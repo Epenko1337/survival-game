@@ -24,6 +24,8 @@ public partial class debug_overlay : Node2D
 	public bool manualTimeScale = false;
 	private player playerInstance;
 	private Label posLabel;
+	private WorldCmd worldCmd;
+	private Button testBtn;
 	public override void _Ready()
 	{
 		container = GetNode<VBoxContainer>("VBoxContainer");
@@ -34,6 +36,7 @@ public partial class debug_overlay : Node2D
 		timeSlider = container.GetNode<HSlider>("TimeSlider");
 		timescaleSlider = container.GetNode<HSlider>("TimescaleSlider");
 		playerInstance = GetParent<player>();
+		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
 	}
 
 	public override void _Process(double delta)

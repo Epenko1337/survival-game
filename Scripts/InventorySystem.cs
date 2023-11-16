@@ -8,8 +8,9 @@ public class Inventory
     public Dictionary inventoryItems = new Dictionary();
     public Inventory()
     {
-        globalItems.Add("stick", GlobalItemConstructor("Палка", 0.25f, GD.Load<PackedScene>("res://Scenes/Items/stick.tscn")));
+        globalItems.Add("stick", GlobalItemConstructor("Ветка", 0.25f, GD.Load<PackedScene>("res://Scenes/Items/stick.tscn")));
         globalItems.Add("rock", GlobalItemConstructor("Камень", 0.1f, GD.Load<PackedScene>("res://Scenes/Items/rock.tscn")));
+        globalItems.Add("bigrock", GlobalItemConstructor("Большой камень", 0.2f, GD.Load<PackedScene>("res://Scenes/Items/rock.tscn")));
         globalItems.Add("flint", GlobalItemConstructor("Кремень", 0.1f, GD.Load<PackedScene>("res://Scenes/Items/flint.tscn")));
     }
 
@@ -79,5 +80,16 @@ public class Inventory
         Dictionary item = (Dictionary)inventoryItems[realName];
         uint currCount = (uint)item["count"];
         item["count"] = Mathf.Clamp(currCount - count, 0, currCount);
+    }
+
+    public bool Contains(string realName, uint count = 1)
+    {
+        if (!inventoryItems.ContainsKey(realName)) return false;
+        else
+        {
+            uint currcount = inventoryItems[realName].As<Dictionary>()["count"].As<uint>();
+            if (currcount < count) return false;
+            return true; 
+        }
     }
 }

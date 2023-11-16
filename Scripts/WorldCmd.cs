@@ -5,7 +5,7 @@ using System;
 public partial class WorldCmd : Node
 {
     [Signal]
-	public delegate void WorldTimeUpdateEventHandler(float WorldTime);
+	public delegate void WorldTimeUpdateEventHandler(float WorldTime) ;
 
     [Signal]
     public delegate void StopWorldEventHandler();
@@ -26,14 +26,5 @@ public partial class WorldCmd : Node
     public void RequestDestroyWorld()
     {
         EmitSignal(SignalName.DestroyWorld);
-    }
-
-    public void Reset()
-    {
-        foreach (Dictionary signalInstance in this.GetIncomingConnections())
-        {
-            Signal signal = (Signal)signalInstance["signal"];
-            signal.Owner.Disconnect(signal.Name, (Callable)signalInstance["callable"]);
-        }
     }
 }

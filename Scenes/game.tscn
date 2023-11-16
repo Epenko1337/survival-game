@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/game.cs" id="1_ld83f"]
 [ext_resource type="PackedScene" uid="uid://yvxkk53dyyjj" path="res://Scenes/player.tscn" id="2_5gtf3"]
 [ext_resource type="Material" uid="uid://cwuhe6a3rnhxt" path="res://Materials/snow_004.tres" id="2_x61la"]
-[ext_resource type="AudioStream" uid="uid://g58c3ipqasq2" path="res://Assets/Sounds/ambience/wind.mp3" id="3_4uw51"]
+[ext_resource type="AudioStream" uid="uid://ddrmv3bw7jn1c" path="res://Assets/Sounds/ambience/wind.mp3" id="3_4uw51"]
 [ext_resource type="Script" path="res://Scripts/WindSound.cs" id="4_l2oog"]
 [ext_resource type="MeshLibrary" uid="uid://clcokm5uu4pri" path="res://MeshLibs/pine.tres" id="6_fwrty"]
 [ext_resource type="PackedScene" uid="uid://dbs4cjvlk3aym" path="res://Scenes/item_spawner.tscn" id="10_bjiry"]
@@ -73,7 +73,6 @@ radius = 90.0
 spawnTime = 1.0
 spawnChance = 0.5
 initialValue = 100
-debugInfo = true
 
 [connection signal="finished" from="Ambient" to="Ambient" method="OnFinished"]
 [connection signal="DebugManualNewTime" from="Player" to="." method="OnDebugTimeChange"]

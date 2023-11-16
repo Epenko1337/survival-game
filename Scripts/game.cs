@@ -43,14 +43,25 @@ public partial class game : Node3D
 	{
 		worldEnvironment = GetNode<WorldEnvironment>("WorldEnvironment");
 		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
-		worldCmd.StopWorld += () => Stop();
-		worldCmd.DestroyWorld += () => Destroy();
 		pinesGridmap = GetNode<GridMap>("Pines");
 		pineScene = GD.Load<PackedScene>("res://Scenes/pine.tscn");
 		ambientPlayer = GetNode<AudioStreamPlayer>("Ambient");
 		random = new RandomNumberGenerator();
 		random.Randomize();
+		ConnectThings();
 		GenerateWorld();
+	}
+
+	public void ConnectThings()
+	{
+		worldCmd.StopWorld += Stop;
+		worldCmd.DestroyWorld += Destroy;
+	}
+
+	public void DisconnectThings()
+	{
+		worldCmd.StopWorld -= Stop;
+		worldCmd.DestroyWorld -= Destroy;
 	}
 
     public override void _PhysicsProcess(double delta)
@@ -103,7 +114,7 @@ public partial class game : Node3D
 			Node3D pine = pineScene.Instantiate<Node3D>();
 			AddChild(pine);
 			pine.GlobalPosition = pinesGridmap.MapToLocal(usedCells[i]) with {Y = 0.35f};
-			pine.Rotation = pine.Rotation with {Y = random.RandfRange(-360, 360)};
+			pine.Rotation = pine.Rotation with {Y = Mathf.DegToRad(random.RandfRange(0, 360))};
 		}
 		pinesGridmap.QueueFree();
 	}
@@ -116,7 +127,7 @@ public partial class game : Node3D
 
 	public void Destroy()
 	{
-		worldCmd.Reset();
+		DisconnectThings();
 		GetTree().ChangeSceneToFile("res://Scenes/menu.tscn");
 	}
 }

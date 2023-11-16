@@ -12,7 +12,6 @@ public partial class ItemSpawner : Node3D
 
 	[Export]
 	public float radius = 0;
-
 	public uint itemCount;
 
 	[Export]
@@ -28,13 +27,10 @@ public partial class ItemSpawner : Node3D
 	public bool debugInfo = false;
 	PlayerCmd playerCmd;
 	PackedScene itemScene;
-	float maxX;
-	float maxZ;
-	float minX;
-	float minZ;
 	RandomNumberGenerator random;
 	WorldCmd worldCmd;
 	float worldTime = 1f;
+	bool initialized = false;
 
 	float worldTimeDelta = 0;
 	public override void _Ready()
@@ -43,15 +39,12 @@ public partial class ItemSpawner : Node3D
 		SetPhysicsProcess(false);
 		playerCmd = GetNode<PlayerCmd>("/root/PlayerCmd");
 		itemScene = playerCmd.globalInventory.globalItems[itemName].As<Dictionary>()["scene"].As<PackedScene>();
-		maxX = GlobalPosition.X + radius;
-		maxZ = GlobalPosition.Z + radius;
-		minX = GlobalPosition.X - radius;
-		minZ = GlobalPosition.Z - radius;
 		random = new RandomNumberGenerator();
 		random.Randomize();
 		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
-		worldCmd.WorldTimeUpdate += (e) => OnWorldTimeUpdate(e);
-		for (uint i = 0; i < initialValue; i++) SpawnTick(); 
+		worldCmd.WorldTimeUpdate += OnWorldTimeUpdate;
+		this.TreeExiting += Clear;
+		for (uint i = 0; i < initialValue; i++) SpawnTick();
 	}
 
 	public void OnWorldTimeUpdate(float newWorldTime)
@@ -70,12 +63,17 @@ public partial class ItemSpawner : Node3D
 		if (GetChildCount() <= maxItemCount && random.RandfRange(0, 1) <= spawnChance)
 		{
 			if (debugInfo) GD.Print($"[{itemName}] {GetChildCount()}");
-			float randX = random.RandfRange(minX, maxX);
-			float randZ = random.RandfRange(minZ, maxZ);
+			float randX = random.RandfRange(GlobalPosition.X - radius, GlobalPosition.X + radius);
+			float randZ = random.RandfRange(GlobalPosition.Z - radius, GlobalPosition.Z + radius);
 			PickableObject item = itemScene.Instantiate<PickableObject>();
 			AddChild(item);
 			item.GlobalPosition = new Vector3(randX, GlobalPosition.Y, randZ);
-			item.Rotation = item.Rotation with {Y = random.RandfRange(0, 360)};
+			item.Rotation = item.Rotation with {Y = Mathf.DegToRad(random.RandfRange(0, 360))};
 		}
+	}
+
+	public void Clear()
+	{
+		worldCmd.WorldTimeUpdate -= OnWorldTimeUpdate;
 	}
 }

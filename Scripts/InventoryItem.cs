@@ -7,11 +7,9 @@ public partial class InventoryItem : PanelContainer
 	public string name;
 	public uint count;
 	public float weight;
-
 	Label valueLabel;
 	Label nameLabel;
 	Button dropButton;
-	
 	PlayerCmd playerCmd;
 	public override void _Ready()
 	{

@@ -21,6 +21,11 @@ public partial class HUD : Node2D
 	public bool inventoryOpen = false;
 	public Control inventoryControl;
 	public Label weightLabel;
+	public bool craftmenuOpen = false;
+	public Control craftmenuControl;
+	public VBoxContainer craftmenuVbox;
+	public PackedScene craftItemScene;
+	public PlayerCmd playerCmd;
 	public override void _Ready()
 	{
 		tempStatus = GetNode<hud_info_item>("TempStatus");
@@ -40,6 +45,11 @@ public partial class HUD : Node2D
 		inventoryVbox = GetNode<VBoxContainer>("Inventory/ScrollContainer/VBoxContainer");
 		inventoryItemScene = GD.Load<PackedScene>("res://Scenes/InventoryItem.tscn");
 		weightLabel = GetNode<Label>("Inventory/WeightLabel");
+		craftmenuControl = GetNode<Control>("CraftMenu");
+		craftmenuControl.Visible = false;
+		craftmenuVbox = GetNode<VBoxContainer>("CraftMenu/ScrollContainer/VBoxContainer");
+		craftItemScene = GD.Load<PackedScene>("res://Scenes/CraftItem.tscn");
+		playerCmd = GetNode<PlayerCmd>("/root/PlayerCmd");
 	}
 
 	public override void _Process(double delta)
@@ -72,9 +82,20 @@ public partial class HUD : Node2D
 
 	public void SwitchInventory()
 	{
+		craftmenuOpen = false;
+		craftmenuControl.Visible = false;
 		inventoryOpen = !inventoryOpen;
 		if (inventoryOpen) UpdateInventory();
 		inventoryControl.Visible = !inventoryControl.Visible;
+	}
+
+	public void SwitchCraftmenu()
+	{
+		inventoryOpen = false;
+		inventoryControl.Visible = false;
+		craftmenuOpen = !craftmenuOpen;
+		craftmenuControl.Visible = !craftmenuControl.Visible;
+		if (craftmenuControl.Visible) UpdateCraftMenu();
 	}
 
 	public void UpdateInventory()
@@ -96,6 +117,22 @@ public partial class HUD : Node2D
 			item.count = itemCount;
 			item.weight = (float)inventoryItem["weight"];
 			inventoryVbox.AddChild(item);
+			item.Update();
+		}
+	}
+
+	public void UpdateCraftMenu()
+	{
+		foreach (Node item in craftmenuVbox.GetChildren())
+		{
+			item.QueueFree();
+		}
+
+		foreach (string key in playerCmd.craftingSystem.Recipes.Keys)
+		{
+			CraftItem item = craftItemScene.Instantiate<CraftItem>();
+			item.realName = key;
+			craftmenuVbox.AddChild(item);
 			item.Update();
 		}
 	}

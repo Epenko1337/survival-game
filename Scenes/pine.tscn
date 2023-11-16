@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://c2fuvqsefvn25"]
 
-[ext_resource type="PackedScene" uid="uid://kybelcvhvmyy" path="res://Assets/Models/pine.glb" id="1_g3ean"]
-[ext_resource type="Texture2D" uid="uid://d33roa2158o3s" path="res://Assets/Models/pine_wood.png" id="2_fpshc"]
-[ext_resource type="Texture2D" uid="uid://82isvppgrf2w" path="res://Assets/Models/pine_pineneedlee.png" id="3_py4cf"]
+[ext_resource type="PackedScene" uid="uid://cn0stlg8c76qb" path="res://Assets/Models/pine.glb" id="1_g3ean"]
+[ext_resource type="Texture2D" uid="uid://dax8r3ofa3q03" path="res://Assets/Models/pine_wood.png" id="2_fpshc"]
+[ext_resource type="Texture2D" uid="uid://c0hwr30jm08d" path="res://Assets/Models/pine_pineneedlee.png" id="3_py4cf"]
 [ext_resource type="Script" path="res://Scripts/ObjectFade.cs" id="4_xorgy"]
 [ext_resource type="PackedScene" uid="uid://dbs4cjvlk3aym" path="res://Scenes/item_spawner.tscn" id="5_h2tx3"]
 
@@ -79,11 +79,11 @@ metadata/_edit_lock_ = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" index="0"]
 shape = SubResource("CylinderShape3D_58gun")
+metadata/_edit_lock_ = true
 
 [node name="ItemSpawner" parent="." index="3" instance=ExtResource("5_h2tx3")]
 itemName = "stick"
 radius = 3.0
-spawnTime = 0.04
-spawnChance = 0.5
+spawnChance = 0.4
 initialValue = 1
 metadata/_edit_lock_ = true

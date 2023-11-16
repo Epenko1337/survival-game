@@ -131,12 +131,26 @@ public partial class player : CharacterBody3D
 		animationTree.AnimationFinished += (e) => OnAnimFinish(e);
 		hintSound = GD.Load<AudioStream>("res://Assets/Sounds/ui/hint.wav");
 		playerCmd = GetNode<PlayerCmd>("/root/PlayerCmd");
-		playerCmd.DropItem += (e) => OnDropItem(e);
 		itemSound = GD.Load<AudioStream>("res://Assets/Sounds/pickup/itemthing.wav");
 		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
-		worldCmd.WorldTimeUpdate += (e) => OnWorldTimeUpdate(e);
 		deathScreenScene = GD.Load<PackedScene>("res://Scenes/deathScreen.tscn");
+		ConnectThings();
+		playerCmd.globalInventory = inventory;
     }
+
+	public void ConnectThings()
+	{
+		playerCmd.DropItem += OnDropItem;
+		worldCmd.WorldTimeUpdate += OnWorldTimeUpdate;
+		playerCmd.CraftItem += OnCraft;
+	}
+
+	public void DisconnectThings()
+	{
+		playerCmd.DropItem -= OnDropItem;
+		worldCmd.WorldTimeUpdate -= OnWorldTimeUpdate;
+		playerCmd.CraftItem -= OnCraft;
+	}
 
     public override void _PhysicsProcess(double delta)
 	{
@@ -145,20 +159,16 @@ public partial class player : CharacterBody3D
 			debugOverlay.Visible = !debugOverlay.Visible;
 		}
 
-		if (Input.IsActionJustPressed("inventory_open"))
+		if (Input.IsActionJustPressed("inventory_open") && !movementBlock)
 		{
 			PlayerHUD.SwitchInventory();
 		}
+		else if (Input.IsActionJustPressed("craftmenu_open") && !movementBlock)
+		{
+			PlayerHUD.SwitchCraftmenu();
+		}
 
 		Vector3 velocity = Velocity;
-
-		//gravity
-		//if (!IsOnFloor())
-			//velocity.Y -= gravity * (float)delta;
-		
-		//jump
-		//if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
-			//velocity.Y = JumpVelocity;
 
 		Vector2 inputDir = Input.GetVector("left", "right", "forward", "backward");
 		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
@@ -405,6 +415,7 @@ public partial class player : CharacterBody3D
 			string name = (string)item["name"];
 			pickupTarget.QueueFree();
 			if (PlayerHUD.inventoryOpen) PlayerHUD.UpdateInventory();
+			if (PlayerHUD.craftmenuOpen) PlayerHUD.UpdateCraftMenu();
 			PlayerHUD.Popup($"Подобрано \"{name}\" ({itemCount})", false);
 			PlaySound(itemSound);
 		}
@@ -424,10 +435,16 @@ public partial class player : CharacterBody3D
 
 	public void Die()
 	{
-		playerCmd.Reset();
+		movementBlock = true;
+		DisconnectThings();
 		worldCmd.RequestStopWorld();
 		deathScreen dscreen = deathScreenScene.Instantiate<deathScreen>();
 		PlayerHUD.AddChild(dscreen);
 		dscreen.Start();
+	}
+
+	public void OnCraft(string craftName)
+	{
+		GD.Print(craftName);
 	}
 }
