@@ -26,6 +26,11 @@ public partial class HUD : Node2D
 	public VBoxContainer craftmenuVbox;
 	public PackedScene craftItemScene;
 	public PlayerCmd playerCmd;
+	public FirestartContextMenu firestartContextMenu;
+	public CampfireCookingContextMenu campfireCookingContextMenu;
+	public PackedScene inventoryItemDrinkScene;
+	public PackedScene inventoryItemFoodScene;
+	public CutAnimalContextMenu cutAnimalContextMenu;
 	public override void _Ready()
 	{
 		tempStatus = GetNode<hud_info_item>("TempStatus");
@@ -50,6 +55,11 @@ public partial class HUD : Node2D
 		craftmenuVbox = GetNode<VBoxContainer>("CraftMenu/ScrollContainer/VBoxContainer");
 		craftItemScene = GD.Load<PackedScene>("res://Scenes/CraftItem.tscn");
 		playerCmd = GetNode<PlayerCmd>("/root/PlayerCmd");
+		firestartContextMenu = GetNode<FirestartContextMenu>("FirestartContextMenu");
+		campfireCookingContextMenu = GetNode<CampfireCookingContextMenu>("CampfireCooking");
+		inventoryItemDrinkScene = GD.Load<PackedScene>("res://Scenes/InventoryItemDrink.tscn");
+		inventoryItemFoodScene = GD.Load<PackedScene>("res://Scenes/InventoryItemFood.tscn");
+		cutAnimalContextMenu = GetNode<CutAnimalContextMenu>("cutAnimalContextMenu");
 	}
 
 	public override void _Process(double delta)
@@ -71,6 +81,13 @@ public partial class HUD : Node2D
 		pickupContextMenu.pickableObject = pickableObject;
 		pickupContextMenu.Visible = true;
 		pickupContextMenu.Update();
+	}
+
+	public void ShowFireStartContext(Campfire campfire, Vector2 screenPos)
+	{
+		firestartContextMenu.Position = screenPos;
+		firestartContextMenu.campfire = campfire;
+		firestartContextMenu.Visible = true;
 	}
 
 	public void Popup(string text, bool sound)
@@ -100,7 +117,7 @@ public partial class HUD : Node2D
 
 	public void UpdateInventory()
 	{
-		weightLabel.Text = $"Занято {playerInstance.inventory.GetFullWeight()}/{playerInstance.maxCapacity} кг";
+		weightLabel.Text = $"Занято {Mathf.Round(playerInstance.inventory.GetFullWeight())}/{playerInstance.maxCapacity} кг";
 		foreach (Node item in inventoryVbox.GetChildren())
 		{
 			item.QueueFree();
@@ -111,7 +128,22 @@ public partial class HUD : Node2D
 			Dictionary inventoryItem = (Dictionary)playerInstance.inventory.inventoryItems[key];
 			uint itemCount = (uint)inventoryItem["count"];
 			if (itemCount == 0) continue;
-			InventoryItem item = inventoryItemScene.Instantiate<InventoryItem>();
+			InventoryItem item = null;
+			switch (playerCmd.globalInventory.globalItems[key].As<Dictionary>()["type"].As<int>())
+			{
+				case (int)Inventory.ItemType.material:
+					item = inventoryItemScene.Instantiate<InventoryItem>();
+					break;
+				case (int)Inventory.ItemType.drink:
+					item = inventoryItemDrinkScene.Instantiate<InventoryItemDrink>();
+					break;
+				case (int)Inventory.ItemType.food:
+					item = inventoryItemFoodScene.Instantiate<InventoryItemFood>();
+					break;
+				default:
+					item = inventoryItemScene.Instantiate<InventoryItem>();
+					break;
+			}
 			item.realName = key;
 			item.name = (string)inventoryItem["name"];
 			item.count = itemCount;

@@ -10,7 +10,7 @@ public partial class InventoryItem : PanelContainer
 	Label valueLabel;
 	Label nameLabel;
 	Button dropButton;
-	PlayerCmd playerCmd;
+	public PlayerCmd playerCmd;
 	public override void _Ready()
 	{
 		valueLabel = GetNode<Label>("HBoxContainer/ValueLabel");

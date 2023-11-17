@@ -19,6 +19,7 @@ offset_right = 350.0
 offset_bottom = 719.0
 size_flags_horizontal = 4
 theme = SubResource("Theme_ur3x5")
+metadata/_edit_use_anchors_ = true
 
 [node name="FPS" type="Label" parent="VBoxContainer"]
 layout_mode = 2
@@ -68,7 +69,17 @@ size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 24
 text = "Godmode"
 
+[node name="ItemText" type="TextEdit" parent="VBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+placeholder_text = "Item name"
+
+[node name="AddItem" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Add item"
+
 [connection signal="value_changed" from="VBoxContainer/TimeSlider" to="." method="ManualTimeNew"]
 [connection signal="toggled" from="VBoxContainer/TimeDebug" to="." method="ManualTimeChange"]
 [connection signal="value_changed" from="VBoxContainer/TimescaleSlider" to="." method="OnTimescaleChange"]
 [connection signal="toggled" from="VBoxContainer/Godmode" to="." method="OnGodmodeChange"]
+[connection signal="pressed" from="VBoxContainer/AddItem" to="." method="AddItem"]

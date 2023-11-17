@@ -25,8 +25,15 @@ public partial class CraftItem : PanelContainer
 	public void Update()
 	{
 		Dictionary recipe = playerCmd.craftingSystem.Recipes[realName].As<Dictionary>();
-		Dictionary resultItem = playerCmd.globalInventory.globalItems[recipe["result"].As<string>()].As<Dictionary>();
-		nameLabel.Text = "  " + resultItem["name"].As<string>();
+		if (recipe["type"].As<int>() == (int)CraftingSystem.CraftType.worldObject)
+		{
+			nameLabel.Text = "  " + recipe["result"].As<string>();
+		}
+		else
+		{
+			Dictionary resultItem = playerCmd.globalInventory.globalItems[recipe["result"].As<string>()].As<Dictionary>();
+			nameLabel.Text = "  " + resultItem["name"].As<string>();
+		}
 		requirements.Text = "  Требуется:";
 		Dictionary needed = recipe["needed"].As<Dictionary>();
 		foreach (string key in needed.Keys)

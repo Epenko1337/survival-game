@@ -74,3 +74,4 @@ libraries = {
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_r6cca")
 volume_db = -20.0
+bus = &"Effects"

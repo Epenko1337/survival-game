@@ -1,0 +1,66 @@
+[gd_scene load_steps=10 format=3 uid="uid://ifsws1xemgxp"]
+
+[ext_resource type="PackedScene" uid="uid://kn0ompi6sdeb" path="res://Assets/Models/Items/campfire.glb" id="1_0c8ig"]
+[ext_resource type="Script" path="res://Scripts/Campfire.cs" id="1_tyj2n"]
+[ext_resource type="Texture2D" uid="uid://dawcd062fapvi" path="res://Assets/smoke.png" id="2_2p6ua"]
+[ext_resource type="AudioStream" uid="uid://wjlq8rd43tu8" path="res://Assets/Sounds/fireignition.mp3" id="4_p6pce"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_x46j1"]
+direction = Vector3(0, -1, 0)
+spread = 20.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = -1.0
+initial_velocity_max = -0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sscql"]
+transparency = 1
+shading_mode = 0
+albedo_texture = ExtResource("2_2p6ua")
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_jc6c8"]
+material = SubResource("StandardMaterial3D_sscql")
+size = Vector2(0.2, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pmkdp"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o6mt0"]
+size = Vector3(1, 0.5, 1)
+
+[node name="campfire" type="Node3D"]
+script = ExtResource("1_tyj2n")
+
+[node name="Model" parent="." instance=ExtResource("1_0c8ig")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0631415, 0.26182, -0.0124979)
+light_color = Color(1, 0.545098, 0.215686, 1)
+light_volumetric_fog_energy = 14.67
+light_size = 1.0
+omni_range = 10.0
+omni_attenuation = 2.37842
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -0.0455837, 0.185468, 0.023818)
+lifetime = 3.0
+process_material = SubResource("ParticleProcessMaterial_x46j1")
+draw_pass_1 = SubResource("QuadMesh_jc6c8")
+
+[node name="WarmArea" type="Area3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1, 0)
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WarmArea"]
+shape = SubResource("BoxShape3D_pmkdp")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("BoxShape3D_o6mt0")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_p6pce")
+bus = &"Ambience"

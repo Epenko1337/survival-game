@@ -25,14 +25,14 @@ public partial class ItemSpawner : Node3D
 
 	[Export]
 	public bool debugInfo = false;
-	PlayerCmd playerCmd;
-	PackedScene itemScene;
-	RandomNumberGenerator random;
-	WorldCmd worldCmd;
-	float worldTime = 1f;
-	bool initialized = false;
+	public PlayerCmd playerCmd;
+	public PackedScene itemScene;
+	public RandomNumberGenerator random;
+	public WorldCmd worldCmd;
+	public float worldTime = 1f;
+	public bool initialized = false;
 
-	float worldTimeDelta = 0;
+	public float worldTimeDelta = 0;
 	public override void _Ready()
 	{
 		SetProcess(false);
@@ -58,7 +58,7 @@ public partial class ItemSpawner : Node3D
 		worldTime = newWorldTime;
 	}
 
-	public void SpawnTick()
+	public virtual void SpawnTick()
 	{
 		if (GetChildCount() <= maxItemCount && random.RandfRange(0, 1) <= spawnChance)
 		{

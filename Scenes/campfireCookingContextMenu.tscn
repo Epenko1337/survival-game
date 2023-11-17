@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3 uid="uid://4grixyjp5728"]
+
+[ext_resource type="Script" path="res://Scripts/CampfireCookingContextMenu.cs" id="1_16abk"]
+
+[node name="campfireCooking" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 216.0
+offset_bottom = 61.0
+script = ExtResource("1_16abk")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.317647)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="BoilBtn" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 14
+text = "Топить снег"
+
+[node name="CookBtn" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Готовить еду"

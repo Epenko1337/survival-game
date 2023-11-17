@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/soundsettings.cs" id="1_5ab5o"]
 [ext_resource type="PackedScene" uid="uid://vgxvaguyalgk" path="res://Scenes/UIButton.tscn" id="2_escnp"]
 [ext_resource type="PackedScene" uid="uid://7neo6sdl1ybx" path="res://Scenes/snow_particles_2d.tscn" id="3_sd6mo"]
-[ext_resource type="Texture2D" uid="uid://cl120fecke6wr" path="res://Assets/Best-Ice-Textures-2414908052.jpg" id="4_vhrer"]
+[ext_resource type="Texture2D" uid="uid://ddcp5wfgtbmk8" path="res://Assets/Best-Ice-Textures-2414908052.jpg" id="4_vhrer"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s8v10"]
 
@@ -54,17 +54,20 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-text = "Обратно в меню"
+text = "Назад в меню"
 
 [node name="Label" type="Label" parent="ObjectsHolder/VBoxContainer"]
 layout_mode = 2
 text = "Громкость эффектов"
 
-[node name="EffecSlider" type="HSlider" parent="ObjectsHolder/VBoxContainer/Label"]
+[node name="EffectSlider" type="HSlider" parent="ObjectsHolder/VBoxContainer/Label"]
 layout_mode = 2
 offset_top = 52.0
 offset_right = 374.0
 offset_bottom = 68.0
+min_value = -80.0
+max_value = 10.0
+step = 0.1
 
 [node name="Label2" type="Label" parent="ObjectsHolder/VBoxContainer"]
 layout_mode = 2
@@ -76,6 +79,9 @@ layout_mode = 2
 offset_top = 110.0
 offset_right = 374.0
 offset_bottom = 126.0
+min_value = -80.0
+max_value = 10.0
+step = 0.1
 
 [node name="SnowParticles" parent="." instance=ExtResource("3_sd6mo")]
 position = Vector2(117, -14)

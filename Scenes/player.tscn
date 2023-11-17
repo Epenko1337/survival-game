@@ -1,24 +1,29 @@
-[gd_scene load_steps=24 format=3 uid="uid://yvxkk53dyyjj"]
+[gd_scene load_steps=33 format=3 uid="uid://yvxkk53dyyjj"]
 
 [ext_resource type="Script" path="res://Scripts/player.cs" id="1_cfpru"]
 [ext_resource type="PackedScene" uid="uid://dpkorxa8a5coq" path="res://Assets/Models/player_anim_model.tscn" id="2_6lte6"]
 [ext_resource type="PackedScene" uid="uid://c6g3txde8865i" path="res://Scenes/hud_info_item.tscn" id="3_5q12t"]
 [ext_resource type="Script" path="res://Scripts/HUD.cs" id="3_c8b1i"]
 [ext_resource type="PackedScene" uid="uid://coeajg0neb87c" path="res://Scenes/debug_overlay.tscn" id="3_nsc6g"]
-[ext_resource type="Texture2D" uid="uid://b0s5xlbin6c5w" path="res://Assets/Textures/thermometer.png" id="3_qd33x"]
+[ext_resource type="Texture2D" uid="uid://la3opy0sjyng" path="res://Assets/Textures/thermometer.png" id="3_qd33x"]
 [ext_resource type="PackedScene" uid="uid://cu1hoj81vnko2" path="res://Scenes/snow_particles.tscn" id="4_uvtet"]
-[ext_resource type="Texture2D" uid="uid://cx8elmdcbytw8" path="res://Assets/Textures/hudBackground.png" id="5_4vboo"]
-[ext_resource type="Texture2D" uid="uid://dun5wkfw8vm2b" path="res://Assets/Textures/eye.png" id="5_dkh04"]
-[ext_resource type="Texture2D" uid="uid://bh8rl7vs7duv6" path="res://Assets/Textures/thirst.png" id="6_1qllu"]
-[ext_resource type="Texture2D" uid="uid://csl0eeg7gqjo0" path="res://Assets/Textures/stomach.png" id="7_ji52h"]
+[ext_resource type="Texture2D" uid="uid://cq7yj0n4dklj7" path="res://Assets/Textures/hudBackground.png" id="5_4vboo"]
+[ext_resource type="Texture2D" uid="uid://b4em7qxa4vjm2" path="res://Assets/Textures/eye.png" id="5_dkh04"]
+[ext_resource type="Texture2D" uid="uid://ddickgqma4ei2" path="res://Assets/Textures/thirst.png" id="6_1qllu"]
+[ext_resource type="Texture2D" uid="uid://07m5q8a6uxxd" path="res://Assets/Textures/stomach.png" id="7_ji52h"]
 [ext_resource type="PackedScene" uid="uid://dqrpcpv4jjx53" path="res://Scenes/healthbar.tscn" id="8_nuiq5"]
-[ext_resource type="Texture2D" uid="uid://cmdpwdrc8sciv" path="res://Assets/Textures/sprint.png" id="10_x8nsq"]
-[ext_resource type="Texture2D" uid="uid://bk18i0s3mk8lg" path="res://Assets/Textures/sun.png" id="12_vqf2u"]
-[ext_resource type="Texture2D" uid="uid://b2e52q4ousd4c" path="res://Assets/Textures/moon.png" id="13_p2aq8"]
+[ext_resource type="Texture2D" uid="uid://blyrbh0qm3tdt" path="res://Assets/Textures/sprint.png" id="10_x8nsq"]
+[ext_resource type="Texture2D" uid="uid://bn4jyy4xnj2f" path="res://Assets/Textures/sun.png" id="12_vqf2u"]
+[ext_resource type="Texture2D" uid="uid://clhj2eeyi6ip2" path="res://Assets/Textures/moon.png" id="13_p2aq8"]
+[ext_resource type="PackedScene" uid="uid://dcaslb311bgcg" path="res://Scenes/firestartContextMenu.tscn" id="15_dbcof"]
 [ext_resource type="PackedScene" uid="uid://cve18ff1kmae" path="res://Scenes/InventoryItem.tscn" id="15_hg0u6"]
 [ext_resource type="Script" path="res://Scripts/Camera.cs" id="15_hycxt"]
 [ext_resource type="PackedScene" uid="uid://dxj0vpx5o0p0i" path="res://Scenes/CraftItem.tscn" id="16_3jqyl"]
+[ext_resource type="PackedScene" uid="uid://4grixyjp5728" path="res://Scenes/campfireCookingContextMenu.tscn" id="16_l2auh"]
 [ext_resource type="PackedScene" uid="uid://c71nk7oa6hwrx" path="res://Scenes/pickupContextMenu.tscn" id="17_u6261"]
+[ext_resource type="PackedScene" uid="uid://drt8aarmmdptw" path="res://Scenes/cutAnimalContextMenu.tscn" id="18_uchyn"]
+[ext_resource type="Script" path="res://Scripts/PositionPicker.cs" id="21_dos3o"]
+[ext_resource type="AudioStream" uid="uid://cthy5k3327lvb" path="res://Assets/Sounds/ui/notification.wav" id="22_fsw01"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_325ts"]
 size = Vector3(0.1, 50, 16)
@@ -30,8 +35,26 @@ polyphony = 64
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_33mhf"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b5ibf"]
+albedo_color = Color(0.470588, 0.843137, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_hhevv"]
+material = SubResource("StandardMaterial3D_b5ibf")
+height = 0.001
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iofda"]
+shading_mode = 0
+albedo_color = Color(0, 0.776471, 0.321569, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_g0bfi"]
+material = SubResource("StandardMaterial3D_iofda")
+size = Vector2(0.2, 6)
+center_offset = Vector3(0, 0, 3)
+
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 1, 0)
+collision_layer = 4
+collision_mask = 4
 script = ExtResource("1_cfpru")
 minCameraDistance = 5.0
 angleLerp = 0.1
@@ -97,6 +120,16 @@ offset_top = 250.0
 offset_right = 506.0
 offset_bottom = 312.0
 
+[node name="FirestartContextMenu" parent="HUD" instance=ExtResource("15_dbcof")]
+visible = false
+offset_left = 117.0
+offset_top = 272.0
+offset_right = 333.0
+offset_bottom = 302.0
+
+[node name="CampfireCooking" parent="HUD" instance=ExtResource("16_l2auh")]
+visible = false
+
 [node name="Inventory" type="Control" parent="HUD"]
 layout_mode = 3
 anchors_preset = 0
@@ -153,6 +186,13 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 24
 text = "Занято"
 horizontal_alignment = 1
+
+[node name="cutAnimalContextMenu" parent="HUD" instance=ExtResource("18_uchyn")]
+visible = false
+offset_left = 142.0
+offset_top = 115.0
+offset_right = 359.0
+offset_bottom = 177.0
 
 [node name="CraftMenu" type="Control" parent="HUD"]
 layout_mode = 3
@@ -225,6 +265,7 @@ transform = Transform3D(-0.4, 0, -2.98023e-08, 0, 0.4, 0, 2.98023e-08, 0, -0.4, 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamPolyphonic_n4x10")
 volume_db = -15.0
+bus = &"Effects"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_fswxa")
@@ -236,7 +277,27 @@ monitoring = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, -2.98023e-08, 1, 0, 0, 0)
 shape = SubResource("CylinderShape3D_33mhf")
 
+[node name="positionPicker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+visible = false
+mesh = SubResource("SphereMesh_hhevv")
+script = ExtResource("21_dos3o")
+
+[node name="placeSound" type="AudioStreamPlayer" parent="positionPicker"]
+stream = ExtResource("22_fsw01")
+bus = &"Effects"
+
+[node name="Crosshair" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
+visible = false
+mesh = SubResource("PlaneMesh_g0bfi")
+
+[connection signal="WantsFireStart" from="." to="HUD" method="ShowFireStartContext"]
 [connection signal="WantsPickup" from="." to="HUD" method="ShowPickupContext"]
 [connection signal="RequestManualNewTime" from="DebugOverlay" to="." method="OnManualNewTime"]
 [connection signal="RequestManualTime" from="DebugOverlay" to="." method="OnManualTimeChange"]
 [connection signal="Pickup" from="HUD/PickupContextMenu" to="." method="OnPickup"]
+[connection signal="StartFire" from="HUD/FirestartContextMenu" to="." method="OnFireStart"]
+[connection signal="BoilWater" from="HUD/CampfireCooking" to="." method="OnBoilWater"]
+[connection signal="CookFood" from="HUD/CampfireCooking" to="." method="OnCookFood"]
+[connection signal="CutAnimal" from="HUD/cutAnimalContextMenu" to="." method="OnCutAnimal"]

@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://btj84x482w620"]
+
+[ext_resource type="Script" path="res://Scripts/Animal.cs" id="1_t64yn"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mb56v"]
+radius = 5.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x2qdn"]
+shading_mode = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6p6n8"]
+material = SubResource("StandardMaterial3D_x2qdn")
+top_radius = 5.0
+height = 0.001
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3dl5l"]
+height = 1.0
+radius = 0.4
+
+[node name="BaseAnimal" type="RigidBody3D"]
+collision_mask = 0
+mass = 0.01
+gravity_scale = 0.0
+can_sleep = false
+script = ExtResource("1_t64yn")
+
+[node name="PlayerDetectArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerDetectArea"]
+shape = SubResource("CylinderShape3D_mb56v")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerDetectArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("CylinderMesh_6p6n8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_3dl5l")

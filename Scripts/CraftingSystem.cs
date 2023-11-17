@@ -4,7 +4,7 @@ using System;
 
 public class CraftingSystem
 {
-    public enum CraftType : int
+    public enum CraftType
 	{
 		item,
 		worldObject,
@@ -13,27 +13,41 @@ public class CraftingSystem
 
     public CraftingSystem()
     {
-        RecipeConstructor("bigrock", "bigrock", 
+        RecipeConstructor("campfire", "Костер", GD.Load<PackedScene>("res://Scenes/Items/campfire.tscn"), 
         new Dictionary
         {
-            {"rock", 2}
+            {"rock", 4},
+            {"stick", 4},
         },
         new Dictionary
         {
-            {"rock", 2}
-        },
-        5, (int)CraftType.item);
+            {"rock", 4},
+            {"stick", 4},   
+        });
     }
 
-    public void RecipeConstructor(string craftName, string resultName, Dictionary neededItems, Dictionary takedItems, float craftTime, int type)
+    public void RecipeConstructor(string craftName, string resultName, uint count, Dictionary neededItems, Dictionary takedItems, float craftTime)
     {
         Recipes.Add(craftName, new Dictionary
         {
             {"result", resultName},
+            {"count", count},
             {"needed", neededItems},
             {"taked", takedItems},
             {"time", craftTime},
-            {"type", type},
+            {"type", (int)CraftType.item},
+        });
+    }
+
+    public void RecipeConstructor(string craftName, string resultName, PackedScene resultScene, Dictionary neededItems, Dictionary takedItems)
+    {
+        Recipes.Add(craftName, new Dictionary
+        {
+            {"result", resultName},
+            {"scene", resultScene},
+            {"needed", neededItems},
+            {"taked", takedItems},
+            {"type", (int)CraftType.worldObject},
         });
     }
 }

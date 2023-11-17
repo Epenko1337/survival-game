@@ -48,4 +48,10 @@ public partial class ContextMenu : Control
             }
         }
     }
+
+    public void EmitNClose(StringName signalName, params Variant[] args)
+    {
+        EmitSignal(signalName, args);
+        Bye();
+    }
 }

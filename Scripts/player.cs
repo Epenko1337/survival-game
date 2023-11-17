@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.ComponentModel;
 
 public partial class player : CharacterBody3D
 {
@@ -49,6 +49,9 @@ public partial class player : CharacterBody3D
 
 	[Signal]
 	public delegate void WantsPickupEventHandler(PickableObject pickableObject, Vector2 screenPos);
+
+	[Signal]
+	public delegate void WantsFireStartEventHandler(Campfire campfire, Vector2 screenPos);
 
 	private Camera3D Camera;
 	private AnimationPlayer animationPlayer;
@@ -97,6 +100,20 @@ public partial class player : CharacterBody3D
 	PlayerCmd playerCmd;
 	WorldCmd worldCmd;
 	PackedScene deathScreenScene;
+	public AudioStream deathMusic;
+	public RandomNumberGenerator random;
+
+	public bool campfireBonus = false;
+	public AudioStream flintSound;
+	public bool inPosSelectMode = false;
+	public PositionPicker positionPicker;
+	public AudioStream boilSound;
+	public AudioStream drinkingSound;
+	public AudioStream eatingSound;
+	public BoneAttachment3D handAttachment;
+	public PackedScene throwableRockScene;
+	public MeshInstance3D crosshair;
+	public AudioStream cuttingSound;
 
     public override void _Ready()
     {
@@ -128,6 +145,7 @@ public partial class player : CharacterBody3D
 		screenSize = GetViewport().GetVisibleRect().Size;
 		debugRect = GD.Load<PackedScene>("res://Scenes/debug_rect.tscn");
 		inventory = new Inventory();
+		inventory.maxCapacity = maxCapacity;
 		animationTree.AnimationFinished += (e) => OnAnimFinish(e);
 		hintSound = GD.Load<AudioStream>("res://Assets/Sounds/ui/hint.wav");
 		playerCmd = GetNode<PlayerCmd>("/root/PlayerCmd");
@@ -136,6 +154,20 @@ public partial class player : CharacterBody3D
 		deathScreenScene = GD.Load<PackedScene>("res://Scenes/deathScreen.tscn");
 		ConnectThings();
 		playerCmd.globalInventory = inventory;
+		deathMusic = GD.Load<AudioStream>("res://Assets/Sounds/ambience/deathodessy.mp3");
+		playerCmd.CampfireSwitch += OnCampfireSwitch;
+		inventory.AddItem("knife", 1);
+		random = new RandomNumberGenerator();
+		random.Randomize();
+		flintSound = GD.Load<AudioStream>("res://Assets/Sounds/flintsteel.wav");
+		positionPicker = GetNode<PositionPicker>("positionPicker");
+		boilSound = GD.Load<AudioStream>("res://Assets/Sounds/waterpour.mp3");
+		drinkingSound = GD.Load<AudioStream>("res://Assets/Sounds/drinking.mp3");
+		eatingSound = GD.Load<AudioStream>("res://Assets/Sounds/eating.wav");
+		handAttachment = playerModel.GetNode<BoneAttachment3D>("Armature/Skeleton3D/HandAttachment");
+		throwableRockScene = GD.Load<PackedScene>("res://Scenes/ThrowableRock.tscn");
+		crosshair = GetNode<MeshInstance3D>("Crosshair");
+		cuttingSound = GD.Load<AudioStream>("res://Assets/Sounds/cut.wav");
     }
 
 	public void ConnectThings()
@@ -143,6 +175,8 @@ public partial class player : CharacterBody3D
 		playerCmd.DropItem += OnDropItem;
 		worldCmd.WorldTimeUpdate += OnWorldTimeUpdate;
 		playerCmd.CraftItem += OnCraft;
+		playerCmd.Drink += OnDrink;
+		playerCmd.Eat += OnEat;
 	}
 
 	public void DisconnectThings()
@@ -150,6 +184,8 @@ public partial class player : CharacterBody3D
 		playerCmd.DropItem -= OnDropItem;
 		worldCmd.WorldTimeUpdate -= OnWorldTimeUpdate;
 		playerCmd.CraftItem -= OnCraft;
+		playerCmd.Drink -= OnDrink;
+		playerCmd.Eat -= OnEat;
 	}
 
     public override void _PhysicsProcess(double delta)
@@ -167,6 +203,7 @@ public partial class player : CharacterBody3D
 		{
 			PlayerHUD.SwitchCraftmenu();
 		}
+		crosshair.Visible = Input.IsActionPressed("crosshair") && rotationControlled;
 
 		Vector3 velocity = Velocity;
 
@@ -216,10 +253,11 @@ public partial class player : CharacterBody3D
 			Vector2 mousePos = GetViewport().GetMousePosition();
 			newRotation.Y = Mathf.LerpAngle(newRotation.Y, Mathf.Atan2(viewportCenter.X - mousePos.X, viewportCenter.Y - mousePos.Y) + Mathf.DegToRad(180), angleLerp);
 			playerModel.Rotation = newRotation;
+			crosshair.Rotation = newRotation;
 		}
 
-		animationTree.Set("parameters/WalkSpeed/scale", velocity.Length() / 2.5);
-		animationTree.Set("parameters/RunSpeed/scale", velocity.Length() / 4);
+		animationTree.Set("parameters/WalkSpeed/scale", velocity.Length() / 2.5f);
+		animationTree.Set("parameters/RunSpeed/scale", velocity.Length() / 4f);
 		float animAmount = velocity.Length() / (sprinting ? Speed*SprintMultiplier : Speed) * (sprinting ? 2 : 1);
 		float currRunBlend = (float)animationTree.Get("parameters/RunBlend/blend_amount");
 		float controllRotationBlend = (float)animationTree.Get("parameters/controlledBlend/blend_amount");
@@ -271,16 +309,51 @@ public partial class player : CharacterBody3D
 						Dictionary dict = ScreenToWorld(eventMouse.Position, 2);
 						if (dict.ContainsKey("collider"))
 						{
-							Node parent = dict["collider"].As<Node>().GetParent();
-							InteractionMenu(parent, eventMouse.Position);
+							Node node = dict["collider"].As<Node>();
+							if (node is RigidBody3D)
+							{
+								InteractionMenu(node, eventMouse.Position);
+							}
+							else
+							{
+								Node parent = node.GetParent();
+								InteractionMenu(parent, eventMouse.Position);
+							}
 						}
 					}
 					rotationControlled = true;
 				}
-				else rotationControlled = false;
+				else 
+				{
+					rotationControlled = false;
+				}
 			}
 			else
 			{
+				if (eventMouse.ButtonMask == (MouseButtonMask.Left | MouseButtonMask.Right))
+				{
+					if (rotationControlled)
+					{
+						if (inventory.Contains("rock", 1))
+						{
+							inventory.RemoveItem("rock");
+							if (PlayerHUD.inventoryOpen) PlayerHUD.UpdateInventory();
+							if (PlayerHUD.craftmenuOpen) PlayerHUD.UpdateCraftMenu();
+							ThrowableRock rock = throwableRockScene.Instantiate<ThrowableRock>();
+							world.AddChild(rock);
+							Vector3 startPos = GlobalPosition;
+							startPos.Y = 2;
+							startPos.X += Mathf.Sin(playerModel.Rotation.Y + 0.7853981633974483f);
+							startPos.Z += Mathf.Cos(playerModel.Rotation.Y + 0.7853981633974483f);
+							rock.GlobalPosition = startPos;
+							Vector3 velocity = new Vector3(0, 2, 0);
+							velocity.X = Mathf.Sin(playerModel.Rotation.Y + 0.7853981633974483f) * 5;
+							velocity.Z = Mathf.Cos(playerModel.Rotation.Y + 0.7853981633974483f) * 5;
+							rock.LinearVelocity = velocity;
+						}
+	
+					}
+				}
 				rotationControlled = false;
 			}
 		}
@@ -302,9 +375,34 @@ public partial class player : CharacterBody3D
 	{
 		if (node is PickableObject pickableObject)
 		{
-			if (GlobalPosition.DistanceTo(pickableObject.GlobalPosition) < maxPickupDistance)
+			if (GlobalPosition.DistanceTo(pickableObject.GlobalPosition) <= maxPickupDistance)
 			{
 				EmitSignal(SignalName.WantsPickup, pickableObject, screenPos);
+			}
+		}
+		else if (node is Campfire campfire)
+		{
+			if (GlobalPosition.DistanceTo(campfire.GlobalPosition) <= maxPickupDistance)
+			{
+				if (campfire.started && campfire.alive)
+				{
+					PlayerHUD.campfireCookingContextMenu.Update();
+					PlayerHUD.campfireCookingContextMenu.Position = screenPos;
+					PlayerHUD.campfireCookingContextMenu.Visible = true;
+				}
+				else if (campfire.alive)
+				{
+					EmitSignal(SignalName.WantsFireStart, campfire, screenPos);
+				}
+			}
+		}
+		else if (node is Animal animal)
+		{
+			if (GlobalPosition.DistanceTo(animal.GlobalPosition) <= maxPickupDistance)
+			{
+				PlayerHUD.cutAnimalContextMenu.Position = screenPos;
+				PlayerHUD.cutAnimalContextMenu.Visible = true;
+				PlayerHUD.cutAnimalContextMenu.animal = animal;
 			}
 		}
 	}
@@ -382,8 +480,15 @@ public partial class player : CharacterBody3D
 			if (stamina / staminaMax > 0.2) staminaDrained = false;
 		}
 
-		internalTemp = Mathf.Clamp(internalTemp - internalTempMax / 100f * (world.night ? 0.4f : 0.2f) * delta, 0, internalTempMax);
-		fatigue = Mathf.Clamp(fatigue - fatigueMax / 100f * 0.07f * delta * (sprinting && moving ? 2f : 1f), 0, fatigueMax);
+		if (campfireBonus)
+		{
+			internalTemp = Mathf.Clamp(internalTemp + internalTempMax / 100f * 0.5f * delta, 0, internalTempMax);
+		}
+		else
+		{
+			internalTemp = Mathf.Clamp(internalTemp - internalTempMax / 100f * (world.night ? 0.4f : 0.2f) * delta, 0, internalTempMax);
+		}
+		//fatigue = Mathf.Clamp(fatigue - fatigueMax / 100f * 0.07f * delta * (sprinting && moving ? 2f : 1f), 0, fatigueMax);
 		thirst = Mathf.Clamp(thirst - thirstMax / 100f * 0.09f * delta * (sprinting && moving ? 2f : 1f), 0, thirstMax);
 		hunger = Mathf.Clamp(hunger - hungerMax / 100f * 0.06f * delta * (sprinting && moving ? 2f : 1f), 0, hungerMax);
 
@@ -426,6 +531,7 @@ public partial class player : CharacterBody3D
 		inventory.RemoveItem(realName);
 		PlayerHUD.UpdateInventory();
 		PackedScene itemScene = inventory.globalItems[realName].As<Dictionary>()["scene"].As<PackedScene>();
+		if (itemScene == null) return;
 		PickableObject item = itemScene.Instantiate<PickableObject>();
 		item.Position = Position with {Y = 0};
 		item.Rotation = playerModel.Rotation with {X = 0, Z = 0};
@@ -439,12 +545,100 @@ public partial class player : CharacterBody3D
 		DisconnectThings();
 		worldCmd.RequestStopWorld();
 		deathScreen dscreen = deathScreenScene.Instantiate<deathScreen>();
-		PlayerHUD.AddChild(dscreen);
+		AddChild(dscreen);
 		dscreen.Start();
+		animationTree.Set("parameters/dieBlend/blend_amount", 1);
+		PlayerHUD.Visible = false;
 	}
 
 	public void OnCraft(string craftName)
 	{
-		GD.Print(craftName);
+		Dictionary craft = playerCmd.craftingSystem.Recipes[craftName].As<Dictionary>();
+		int type = craft["type"].As<int>();
+		Dictionary taked = craft["taked"].As<Dictionary>();
+		foreach (string key in taked.Keys)
+		{
+			inventory.RemoveItem(key, taked[key].As<uint>());
+		}
+		if (type == (int)CraftingSystem.CraftType.item)
+		{
+			inventory.AddItem(craft["result"].As<string>(), craft["count"].As<uint>());
+		}
+		else if (type == (int)CraftingSystem.CraftType.worldObject)
+		{
+			PlayerHUD.SwitchCraftmenu();
+			positionPicker.Enable(playerModel, craft["scene"].As<PackedScene>());
+		}
+		PlayerHUD.UpdateCraftMenu();
+	}
+
+	public void OnCampfireSwitch(bool entered)
+	{
+		campfireBonus = entered;
+	}
+
+	public void OnFireStart(Campfire campfire)
+	{
+		if (inventory.inventoryItems.ContainsKey("knife"))
+		{
+			if (inventory.inventoryItems.ContainsKey("flint"))
+			{
+				if (inventory.inventoryItems["flint"].As<Dictionary>()["count"].As<uint>() > 0)
+				{
+					worldCmd.RequestSkipWorldTime(0.01f);
+					PlaySound(flintSound);
+					if (random.RandfRange(0, 1) < 0.1f)
+					{
+						campfire.Burn();
+					}
+					if (random.RandfRange(0, 1) < 0.1f)
+					{
+						inventory.RemoveItem("flint");
+						PlayerHUD.Popup("Кремень сломался", true);
+					}
+				}
+			}
+		}
+	}
+
+	public void OnBoilWater()
+	{
+		worldCmd.RequestSkipWorldTime(0.005f);
+		PlaySound(boilSound);
+		inventory.AddItem("water", 1);
+		PlayerHUD.Popup("Полчено \"Вода\"", true);
+	}
+
+	public void OnCookFood()
+	{
+		inventory.RemoveItem("meat");
+		PlayerHUD.UpdateInventory();
+		inventory.AddItem("cookedmeat", 1);
+		PlayerHUD.Popup("Полчено \"Приготовленное мясо\"", true);
+	}
+
+	public void OnDrink(string realName)
+	{
+		inventory.RemoveItem(realName);
+		PlayerHUD.UpdateInventory();
+		PlaySound(drinkingSound);
+		thirst += thirstMax / 100 * 15;
+	}
+
+	public void OnEat(string realName)
+	{
+		inventory.RemoveItem(realName);
+		PlayerHUD.UpdateInventory();
+		PlaySound(eatingSound);
+		hunger += hungerMax / 100 * 30;
+	}
+
+	public void OnCutAnimal(Animal animal)
+	{
+		animal.QueueFree();
+		inventory.AddItem("meat", 1);
+		PlayerHUD.UpdateInventory();
+		PlaySound(cuttingSound);
+		PlayerHUD.Popup("Получено \"Мясо\"", true);
 	}
 }

@@ -13,15 +13,19 @@ public partial class deathScreen : Node2D
 		audioStreamPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
 		animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
-		audioStreamPlayer.Finished += () => GotoMenu();
     }
     public void Start()
 	{
 		audioStreamPlayer.Play();
-		animationPlayer.Play("fade");
+		animationPlayer.Play("blink_loop");
 	}
 
-	public void GotoMenu()
+    public override void _Process(double delta)
+    {
+        if (Input.IsActionJustPressed("space")) GotoMenu();
+    }
+
+    public void GotoMenu()
 	{
 		worldCmd.RequestDestroyWorld();
 	}

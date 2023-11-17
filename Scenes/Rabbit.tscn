@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3 uid="uid://c1hy34e3uq2r8"]
+
+[ext_resource type="Script" path="res://Scripts/Rabbit.cs" id="1_ho1a2"]
+[ext_resource type="PackedScene" uid="uid://fi5cfbeelovq" path="res://Assets/Models/rabbit_anim_model.tscn" id="2_x8r5q"]
+[ext_resource type="AudioStream" uid="uid://be6anwmtb5rev" path="res://Assets/Sounds/rabbitdie.wav" id="3_m5d8y"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mb56v"]
+radius = 5.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x2qdn"]
+shading_mode = 0
+albedo_color = Color(0.25098, 0.25098, 0.25098, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6p6n8"]
+material = SubResource("StandardMaterial3D_x2qdn")
+top_radius = 5.0
+height = 0.001
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3dl5l"]
+height = 1.0
+radius = 0.4
+
+[node name="Rabbit" type="RigidBody3D" groups=["Animal"]]
+collision_mask = 0
+mass = 0.01
+gravity_scale = 0.0
+can_sleep = false
+script = ExtResource("1_ho1a2")
+detectRadius = 4.0
+afkTime = 7000.0
+Speed = 4.0
+ScaredSpeed = 6.0
+runAnimBlend = "parameters/RunBlend/blend_amount"
+dieAnimBlend = "parameters/DieBlend/blend_amount"
+runTimescale = "parameters/runSpeed/scale"
+
+[node name="PlayerDetectArea" type="Area3D" parent="." groups=["Animal"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerDetectArea" groups=["Animal"]]
+shape = SubResource("CylinderShape3D_mb56v")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="PlayerDetectArea" groups=["Animal"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+visible = false
+mesh = SubResource("CylinderMesh_6p6n8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." groups=["Animal"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("CylinderShape3D_3dl5l")
+
+[node name="Model" parent="." instance=ExtResource("2_x8r5q")]
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, 0, 0, 0)
+metadata/_edit_lock_ = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_m5d8y")
+bus = &"Effects"

@@ -26,6 +26,8 @@ public partial class debug_overlay : Node2D
 	private Label posLabel;
 	private WorldCmd worldCmd;
 	private Button testBtn;
+	private TextEdit itemEdit;
+	private Button addItem;
 	public override void _Ready()
 	{
 		container = GetNode<VBoxContainer>("VBoxContainer");
@@ -37,6 +39,8 @@ public partial class debug_overlay : Node2D
 		timescaleSlider = container.GetNode<HSlider>("TimescaleSlider");
 		playerInstance = GetParent<player>();
 		worldCmd = GetNode<WorldCmd>("/root/WorldCmd");
+		itemEdit = container.GetNode<TextEdit>("ItemText");
+		addItem = container.GetNode<Button>("AddItem");
 	}
 
 	public override void _Process(double delta)
@@ -83,5 +87,13 @@ public partial class debug_overlay : Node2D
 	public void OnTimescaleChange(float newTimescale)
 	{
 		playerInstance.world.timeScale = newTimescale;
+	}
+
+	public void AddItem()
+	{
+		if (playerInstance.inventory.globalItems.ContainsKey(itemEdit.Text))
+		{
+			playerInstance.inventory.AddItem(itemEdit.Text, 1);
+		}
 	}
 }

@@ -53,12 +53,16 @@ public partial class game : Node3D
 	{
 		worldCmd.StopWorld += Stop;
 		worldCmd.DestroyWorld += Destroy;
+		worldCmd.SkipWorldTime += OnSkipTime;
+		worldCmd.AddWorldChild += OnAddChild;
 	}
 
 	public void DisconnectThings()
 	{
 		worldCmd.StopWorld -= Stop;
 		worldCmd.DestroyWorld -= Destroy;
+		worldCmd.SkipWorldTime -= OnSkipTime;
+		worldCmd.AddWorldChild -= OnAddChild;
 	}
 
     public override void _PhysicsProcess(double delta)
@@ -66,7 +70,7 @@ public partial class game : Node3D
 		if (worldEnd)
 		{
 			worldTime = (float)Mathf.Clamp(worldTime - 0.1*delta, 0, 1);
-			worldEnvironment.Environment.FogDensity = (float)Mathf.Clamp(worldEnvironment.Environment.FogDensity + 0.1*delta, 0, 1);
+			worldEnvironment.Environment.FogDensity = (float)Mathf.Clamp(worldEnvironment.Environment.FogDensity + 0.1*delta, 0, 0.3);
 		}
 		else if (!debugManualTime)
 		{
@@ -127,5 +131,26 @@ public partial class game : Node3D
 	{
 		DisconnectThings();
 		GetTree().ChangeSceneToFile("res://Scenes/menu.tscn");
+	}
+
+	public void OnSkipTime(float value)
+	{
+		float newWorldTime = worldTime + value * (timeDirection ? -1 : 1);
+		if (newWorldTime > 1)
+		{
+			timeDirection = true;
+			newWorldTime = 1 - (newWorldTime - 1);
+		}
+		else if (newWorldTime < 0)
+		{
+			timeDirection = false;
+			newWorldTime *= -1;
+		}
+		worldTime = newWorldTime;
+	}
+
+	public void OnAddChild(Node node)
+	{
+		AddChild(node);
 	}
 }

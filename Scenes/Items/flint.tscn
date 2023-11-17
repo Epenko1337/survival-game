@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bhmgbwakuufkl"]
 
 [ext_resource type="Script" path="res://Scripts/PickableObject.cs" id="1_ijm0c"]
-[ext_resource type="PackedScene" uid="uid://b4ehvidkx4odn" path="res://Assets/Models/Items/flint.glb" id="2_oomb0"]
+[ext_resource type="PackedScene" uid="uid://bna543n3avwfj" path="res://Assets/Models/Items/flint.glb" id="2_oomb0"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ggn7q"]
 size = Vector3(0.270247, 0.238964, 0.407091)

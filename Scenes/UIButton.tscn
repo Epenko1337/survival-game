@@ -16,9 +16,11 @@ script = ExtResource("1_os0qa")
 
 [node name="clickStream" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_lj2vr")
+bus = &"Effects"
 
 [node name="hoverStream" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_0ac6a")
+bus = &"Effects"
 
 [connection signal="button_down" from="." to="." method="BtnDown"]
 [connection signal="mouse_entered" from="." to="." method="BtnHover"]

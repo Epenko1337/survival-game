@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://b32xndy84amix"]
+
+[ext_resource type="Script" path="res://Scripts/PickableObject.cs" id="1_0vxbf"]
+[ext_resource type="PackedScene" uid="uid://c81k2hlsora6o" path="res://Assets/Models/Items/meat.glb" id="2_piir1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ggn7q"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[node name="meat" type="Node3D"]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
+script = ExtResource("1_0vxbf")
+item_name = "meat"
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0165201, 0, 0.00502411)
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_ggn7q")
+
+[node name="Model" parent="." instance=ExtResource("2_piir1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
